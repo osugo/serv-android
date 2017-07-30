@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="15dip"
+    tools:context="app.property.management.activity.Home">
+
+    <org.angmarch.views.NiceSpinner
+        android:id="@+id/serviceSpinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:arrowTint="@android:color/black"
+        app:dropDownListPaddingBottom="10dp"
+        app:textTint="@android:color/darker_gray" />
+
+    <EditText
+        android:id="@+id/description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/serviceSpinner"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/text_bg"
+        android:inputType="textMultiLine" />
+
+    <org.angmarch.views.NiceSpinner
+        android:id="@+id/providerSpinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/description"
+        app:arrowTint="@android:color/black"
+        app:dropDownListPaddingBottom="10dp"
+        app:textTint="@android:color/darker_gray" />
+
+    <Button
+        android:id="@+id/proceed"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_alignParentBottom="true"
+        android:text="Proceed"
+        android:textAllCaps="true" />
+
+</RelativeLayout>

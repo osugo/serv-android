@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">House</string>
+    <string name="request_confirmation">Your request is being processed. You will receive a notification shortly with a confirmation.</string>
+    <string name="ok">Ok</string>
+</resources>

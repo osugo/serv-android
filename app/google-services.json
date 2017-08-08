@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "275400286091",
+    "project_id": "house-4d0b9"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:275400286091:android:d7f9d473df030ace",
+        "android_client_info": {
+          "package_name": "app.property.management"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "275400286091-26f05mlkkd9h1i18fh6uharnl9f4r1ft.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "275400286091-n0p9ts1ps6a5ivjtl7a40nb67gqduvl4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "app.property.management",
+            "certificate_hash": "8e72c9acdd3d9f65b8775d7378b0ea7ea898bca0"
+          }
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBuXGFk-9eVnC96VrthrO16ovUlpzMRbeg"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

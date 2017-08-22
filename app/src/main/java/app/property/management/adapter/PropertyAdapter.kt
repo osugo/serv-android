@@ -37,8 +37,8 @@ class PropertyAdapter : RecyclerView.Adapter<PropertyAdapter.ViewHolder>() {
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         fun bindItems(property: Property){
-            val name = itemView.findViewById(R.id.name) as TextView
-            val location = itemView.findViewById(R.id.location) as TextView
+            val name = itemView.findViewById<TextView>(R.id.name) as TextView
+            val location = itemView.findViewById<TextView>(R.id.location) as TextView
 
             name.text = property.name
             location.text = property.location

@@ -2,24 +2,42 @@ package app.property.management.activity
 
 import android.app.ProgressDialog
 import android.content.Intent
+import android.content.pm.ActivityInfo
+import android.graphics.Color
+import android.graphics.PorterDuff
+import android.os.Build
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.View
+import android.view.WindowManager
 import app.property.management.R
+import app.property.management.model.User
+import app.property.management.util.RealmUtil
+import com.bumptech.glide.Glide
 import com.google.android.gms.auth.api.Auth
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.auth.api.signin.GoogleSignInResult
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.SignInButton
 import com.google.android.gms.common.api.GoogleApiClient
+import io.realm.Realm
+import io.realm.exceptions.RealmException
 import kotlinx.android.synthetic.main.activity_login.*
+import kotlin.properties.Delegates
 
-class Login : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener {
+class Login : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
+
+    override fun onClick(view: View?) {
+        when(view?.id){
+            R.id.sign_in_button -> signIn()
+        }
+    }
+
+    private var realm: Realm by Delegates.notNull()
 
     override fun onConnectionFailed(connectionResult: ConnectionResult) {
-        // An unresolvable error has occurred and Google APIs (including Sign-In) will not
-        // be available.
+        // An unresolvable error has occurred and Google APIs (including Sign-In) will not be available.
         Log.d(TAG, "onConnectionFailed:" + connectionResult);
     }
 
@@ -32,19 +50,23 @@ class Login : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        window.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_login)
+
+        realm = Realm.getInstance(RealmUtil.getRealmConfig())
 
         val googleSignInOptions: GoogleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build()
 
         googleApiClient = GoogleApiClient.Builder(this).enableAutoManage(this, this).addApi(Auth.GOOGLE_SIGN_IN_API, googleSignInOptions).build()
 
         sign_in_button.setSize(SignInButton.SIZE_STANDARD)
-        sign_in_button.setOnClickListener { onClickSignInButton }
-    }
+        sign_in_button.setOnClickListener(this)
 
-    private val onClickSignInButton = View.OnClickListener {
-        signIn()
+        background.setColorFilter(Color.parseColor("#50000000"), PorterDuff.Mode.ADD)
+
+        Glide.with(this).load(R.drawable.apart_one).centerCrop().error(android.R.color.darker_gray).into(background)
     }
 
     override fun onStart() {
@@ -80,6 +102,10 @@ class Login : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener {
 
         when (requestCode) {
             RC_SIGN_IN -> {
+                Log.e(TAG, "onActivityResult")
+
+                hideProgressDialog()
+
                 val googleSignInResult: GoogleSignInResult = Auth.GoogleSignInApi.getSignInResultFromIntent(data)
                 handleSignInResult(googleSignInResult)
             }
@@ -89,34 +115,49 @@ class Login : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener {
     /**
      * Use retrieved details to populate data on home page
      */
-    private fun handleSignInResult(result: GoogleSignInResult){
+    private fun handleSignInResult(result: GoogleSignInResult) {
         Log.d(TAG, "handleSignInResult:" + result.isSuccess)
         if (result.isSuccess) {
             // Signed in successfully, show authenticated UI.
             val acct = result.signInAccount
 
+            val id: String? = acct?.id
             val name = acct?.displayName
             val email = acct?.email
             val picture = acct?.photoUrl
 
+            Log.e("User", "$name is now logged in")
+
+            try {
+                realm.executeTransaction {
+                    val user = User(id, name, email, picture.toString())
+                    realm.copyToRealmOrUpdate(user)
+                }
+            } catch (e: RealmException) {
+                Log.e(TAG, e.message, e)
+            } finally {
+                startActivity(Intent(this, Home::class.java).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))
+            }
         } else {
             // Signed out, show unauthenticated UI.
         }
     }
 
-    private fun signIn(){
-        val signInIntent : Intent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient)
+    private fun signIn() {
+        showProgressDialog()
+
+        val signInIntent: Intent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient)
         startActivityForResult(signInIntent, RC_SIGN_IN)
     }
 
-    override fun onStop(){
+    override fun onStop() {
         super.onStop()
 
         progressDialog?.dismiss()
     }
 
-    private fun showProgressDialog(){
-        if(progressDialog == null){
+    private fun showProgressDialog() {
+        if (progressDialog == null) {
             progressDialog = ProgressDialog(this)
             progressDialog?.setMessage(getString(R.string.loading))
             progressDialog?.isIndeterminate = true
@@ -125,9 +166,15 @@ class Login : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener {
         progressDialog?.show()
     }
 
-    private fun hideProgressDialog(){
-        if(progressDialog != null && progressDialog!!.isShowing)
+    private fun hideProgressDialog() {
+        if (progressDialog != null && progressDialog!!.isShowing)
             progressDialog?.hide()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        realm.close()
     }
 
 }

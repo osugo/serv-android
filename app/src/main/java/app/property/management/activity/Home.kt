@@ -2,6 +2,7 @@ package app.property.management.activity
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
 import android.widget.Toast
@@ -32,16 +33,16 @@ class Home : AppCompatActivity() {
         providerSpinner.setOnItemSelectedListener(providerSelectListener)
 
         proceed.setOnClickListener {
-            if(service == null)
+            if (service == null)
                 showToast("Please choose a service")
 
-            if(provider == null)
+            if (provider == null)
                 showToast("Please select a preferred provider")
 
-            if(description.text.toString().isEmpty())
+            if (description.text.toString().isEmpty())
                 showToast("Please enter a description")
 
-            if(service != null && provider != null && description.text.toString().isNotEmpty())
+            if (service != null && provider != null && description.text.toString().isNotEmpty())
                 showDialog()
         }
     }
@@ -66,11 +67,19 @@ class Home : AppCompatActivity() {
         }
     }
 
-    private fun showDialog(){
+    private fun showDialog() {
         InfoDialog().show(supportFragmentManager, "InfoDialog")
     }
 
-    private fun showToast(message : String){
+    private fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when (item?.itemId) {
+            android.R.id.home -> onBackPressed()
+            else -> super.onOptionsItemSelected(item)
+        }
+        return true
     }
 }

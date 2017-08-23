@@ -37,6 +37,8 @@ dependencies {
     compile 'com.github.arcadefire:nice-spinner:1.2'
     compile 'com.google.android.gms:play-services-plus:11.2.0'
     compile 'com.google.android.gms:play-services-auth:11.2.0'
+    compile "org.jetbrains.anko:anko:0.10.1"
+    compile 'jp.wasabeef:glide-transformations:2.0.2'
 
     testCompile 'junit:junit:4.12'
 }

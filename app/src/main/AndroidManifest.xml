@@ -3,14 +3,15 @@
     package="app.property.management">
 
     <application
+        android:name=".House"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:name=".House"
         android:theme="@style/BaseTheme">
-        <activity android:name=".activity.Login"
+        <activity
+            android:name=".activity.Login"
             android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -18,8 +19,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.Home"
-            android:launchMode="singleTop"/>
+        <activity
+            android:name=".activity.Home"
+            android:launchMode="singleTop" />
+        <activity
+            android:name=".activity.PropertySelection"
+            android:launchMode="singleTop" />
     </application>
 
 </manifest>

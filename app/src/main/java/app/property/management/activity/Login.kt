@@ -136,7 +136,7 @@ class Login : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, V
             } catch (e: RealmException) {
                 Log.e(TAG, e.message, e)
             } finally {
-                startActivity(Intent(this, Home::class.java).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))
+                startActivity(Intent(this, PropertySelection::class.java).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP))
             }
         } else {
             // Signed out, show unauthenticated UI.

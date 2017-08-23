@@ -5,4 +5,9 @@
     <string name="server_client_id">275400286091-fl0te1igos6eqhs8ljq4vagr0e9jfrkt.apps.googleusercontent.com</string>
     <string name="loading">Loading...</string>
     <string name="enter_properties">Please Enter Your Properties</string>
+    <string name="office_number">Office Number</string>
+    <string name="commercial">Commercial</string>
+    <string name="house_number">House Number</string>
+    <string name="apartment">Apartment</string>
+    <string name="estate">Estate</string>
 </resources>

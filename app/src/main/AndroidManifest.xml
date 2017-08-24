@@ -25,6 +25,7 @@
         <activity
             android:name=".activity.PropertySelection"
             android:launchMode="singleTop" />
+        <activity android:name=".activity.ServiceSelection" />
     </application>
 
 </manifest>

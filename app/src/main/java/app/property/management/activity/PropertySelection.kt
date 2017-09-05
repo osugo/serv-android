@@ -3,17 +3,17 @@ package app.property.management.activity
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.view.View
 import android.widget.RadioGroup
 import app.property.management.R
 import app.property.management.model.Property
 import app.property.management.model.User
 import app.property.management.util.RealmUtil
-import com.bumptech.glide.Glide
 import io.realm.Realm
 import io.realm.exceptions.RealmException
-import jp.wasabeef.glide.transformations.BlurTransformation
 import kotlinx.android.synthetic.main.property_selection.*
+import kotlinx.android.synthetic.main.toolbar.*
 import org.jetbrains.anko.toast
 import java.util.*
 
@@ -26,7 +26,7 @@ import java.util.*
  */
 class PropertySelection : AppCompatActivity(), View.OnClickListener, RadioGroup.OnCheckedChangeListener {
 
-    private lateinit var typeOfProperty: String
+    private var typeOfProperty: String? = null
     private lateinit var nameOfProperty: String
     private lateinit var houseNumber: String
     private lateinit var locationOfProperty: String
@@ -46,7 +46,7 @@ class PropertySelection : AppCompatActivity(), View.OnClickListener, RadioGroup.
         houseNumber = number.text.toString()
         locationOfProperty = location.text.toString()
 
-        if (typeOfProperty.isEmpty())
+        if (typeOfProperty.isNullOrEmpty())
             typeOfProperty = getPropertyTypeFromId(propertyType.checkedRadioButtonId)
 
         val numberType =
@@ -70,7 +70,7 @@ class PropertySelection : AppCompatActivity(), View.OnClickListener, RadioGroup.
             return
         }
 
-        if (nameOfProperty.isNotBlank() && houseNumber.isNotBlank() && locationOfProperty.isNotBlank() && typeOfProperty.isNotBlank()) {
+        if (nameOfProperty.isNotBlank() && houseNumber.isNotBlank() && locationOfProperty.isNotBlank() && !typeOfProperty.isNullOrBlank()) {
             try {
                 val user: User? = realm.where(User::class.java).findFirst()
 
@@ -79,9 +79,10 @@ class PropertySelection : AppCompatActivity(), View.OnClickListener, RadioGroup.
                     realm.copyToRealmOrUpdate(property)
                 }
             } catch (e: RealmException) {
-                error(e)
+                Log.e(TAG, e.message, e)
             } finally {
-                startActivity(Intent(this, Home::class.java).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP))
+                startActivity(Intent(this, Requests::class.java).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))
+                finish()
             }
         }
     }
@@ -111,9 +112,9 @@ class PropertySelection : AppCompatActivity(), View.OnClickListener, RadioGroup.
         super.onCreate(savedInstanceState)
         setContentView(R.layout.property_selection)
 
-        realm = Realm.getInstance(RealmUtil.getRealmConfig())
+        setSupportActionBar(toolbar)
 
-        Glide.with(this).load(R.drawable.apart_two).bitmapTransform(BlurTransformation(this)).into(background)
+        realm = Realm.getInstance(RealmUtil.getRealmConfig())
 
         proceed.setOnClickListener(this)
         propertyType.setOnCheckedChangeListener(this)

@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="app.property.management">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:name=".House"
         android:allowBackup="true"
@@ -10,6 +12,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/BaseTheme">
+
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="069fc5277125b94ad2d9806c7015774e75bfec79" />
+
         <activity
             android:name=".activity.Login"
             android:launchMode="singleTop">
@@ -20,12 +27,13 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.Home"
+            android:name=".activity.PropertySelection"
+            android:label="Property Details"
             android:launchMode="singleTop" />
         <activity
-            android:name=".activity.PropertySelection"
-            android:launchMode="singleTop" />
-        <activity android:name=".activity.ServiceSelection" />
+            android:name=".activity.Requests"
+            android:label="Services" />
+
     </application>
 
 </manifest>

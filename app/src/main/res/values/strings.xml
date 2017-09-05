@@ -10,4 +10,6 @@
     <string name="house_number">House Number</string>
     <string name="apartment">Apartment</string>
     <string name="estate">Estate</string>
+    <string name="describe_issue">Please describe the issue</string>
+    <string name="schedule_time">Set a preferred time</string>
 </resources>

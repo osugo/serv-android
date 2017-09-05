@@ -1,20 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <ImageView
-        android:id="@+id/background"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:src="@drawable/apart_two"
-        android:scaleType="centerCrop" />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#70000000" />
+    <include layout="@layout/toolbar" />
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -23,25 +13,11 @@
         android:padding="10dp">
 
         <TextView
-            android:id="@+id/title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
-            android:text="Property Info"
-            android:textColor="@android:color/white"
-            android:textSize="25sp"
-            android:textStyle="bold" />
-
-        <TextView
             android:id="@+id/propertyTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/title"
-            android:layout_marginTop="25dp"
             android:text="Property Name"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-            android:textColor="@android:color/white" />
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
         <EditText
             android:id="@+id/name"
@@ -58,8 +34,7 @@
             android:layout_below="@+id/name"
             android:layout_marginTop="25dp"
             android:text="House Number"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-            android:textColor="@android:color/white" />
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
         <EditText
             android:id="@+id/number"
@@ -76,8 +51,7 @@
             android:layout_below="@id/number"
             android:layout_marginTop="25dp"
             android:text="Location"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-            android:textColor="@android:color/white" />
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
         <EditText
             android:id="@+id/location"
@@ -85,7 +59,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/locationText"
             android:imeOptions="actionDone"
-            android:inputType="text" />
+            android:inputType="textCapWords" />
 
         <TextView
             android:id="@+id/propertyTypeText"
@@ -95,8 +69,7 @@
             android:layout_marginBottom="5dp"
             android:layout_marginTop="25dp"
             android:text="Property Type"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-            android:textColor="@android:color/white" />
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
         <RadioGroup
             android:id="@+id/propertyType"
@@ -107,36 +80,35 @@
             android:padding="5dp">
 
             <RadioButton
-                android:id="@+id/commercial"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Commercial"
-                android:textColor="@android:color/white" />
-
-            <RadioButton
                 android:id="@+id/apartment"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Apartments"
-                android:textColor="@android:color/white" />
+                android:enabled="true"
+                android:text="Apartments" />
 
             <RadioButton
                 android:id="@+id/estate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Estate"
-                android:textColor="@android:color/white" />
+                android:text="Estate" />
+
+            <RadioButton
+                android:id="@+id/commercial"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Commercial" />
         </RadioGroup>
 
         <Button
             android:id="@+id/proceed"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="45dp"
             android:layout_alignParentBottom="true"
-            android:background="@color/ProminentBlue"
+            android:background="@color/accent"
             android:text="Proceed"
+            android:textColor="@android:color/white"
             android:textStyle="bold" />
 
     </RelativeLayout>
 
-</FrameLayout>
+</LinearLayout>

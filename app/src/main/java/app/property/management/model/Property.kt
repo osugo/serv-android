@@ -8,7 +8,7 @@ import io.realm.annotations.PrimaryKey
  */
 
 open class Property(
-        @PrimaryKey var id: String?,
+        @PrimaryKey var id: String? = null,
         var name: String? = null,
         var location: String? = null,
         var propertyType: String? = null

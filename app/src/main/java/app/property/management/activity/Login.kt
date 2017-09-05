@@ -2,16 +2,15 @@ package app.property.management.activity
 
 import android.app.ProgressDialog
 import android.content.Intent
-import android.content.pm.ActivityInfo
 import android.graphics.Color
 import android.graphics.PorterDuff
-import android.os.Build
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import app.property.management.R
+import app.property.management.model.Property
 import app.property.management.model.User
 import app.property.management.util.RealmUtil
 import com.bumptech.glide.Glide
@@ -22,6 +21,7 @@ import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.SignInButton
 import com.google.android.gms.common.api.GoogleApiClient
 import io.realm.Realm
+import io.realm.RealmResults
 import io.realm.exceptions.RealmException
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlin.properties.Delegates
@@ -29,7 +29,7 @@ import kotlin.properties.Delegates
 class Login : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
 
     override fun onClick(view: View?) {
-        when(view?.id){
+        when (view?.id) {
             R.id.sign_in_button -> signIn()
         }
     }
@@ -136,7 +136,16 @@ class Login : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, V
             } catch (e: RealmException) {
                 Log.e(TAG, e.message, e)
             } finally {
-                startActivity(Intent(this, PropertySelection::class.java).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP))
+                val results: RealmResults<Property> = realm.where(Property::class.java).findAll()
+
+                if (results.isNotEmpty()) {
+                    startActivity(Intent(this, Requests::class.java).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))
+                    finish()
+                }
+                else {
+                    startActivity(Intent(this, PropertySelection::class.java).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP))
+                    finish()
+                }
             }
         } else {
             // Signed out, show unauthenticated UI.

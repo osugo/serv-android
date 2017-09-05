@@ -1,6 +1,5 @@
 package app.property.management.util
 
-import app.property.management.R
 import io.realm.RealmConfiguration
 
 /**
@@ -8,7 +7,7 @@ import io.realm.RealmConfiguration
  */
 object RealmUtil {
 
-    public fun getRealmConfig(): RealmConfiguration {
+    fun getRealmConfig(): RealmConfiguration {
         return RealmConfiguration.Builder()
                 .name("House")
                 .schemaVersion(1)

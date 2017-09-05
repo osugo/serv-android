@@ -25,14 +25,14 @@
     <color name="floating_action_button_disabled">#a70000</color>
     <color name="DeepGrey">#282e3a</color>
     <color name="MellowGreen">#01b169</color>
+    <color name="CalmGreen">#27ae61</color>
     <color name="Crimson">#bf084b</color>
     <color name="PlushBlue">#3c78ce</color>
     <color name="HappyBlue">#3598db</color>
     <color name="FairRed">#df4931</color>
-    <color name="CalmGreen">#27ae61</color>
     <color name="BrightOrange">#ff9041</color>
     <color name="WarmGrey">#687e8c</color>
-    <color name="BouncyBlue">#1fa4c7</color>
+
     <color name="Vine">#58d093</color>
     <color name="HollowGrey">#37495f</color>
     <color name="PurpBlue">#394263</color>
@@ -44,6 +44,7 @@
     <color name="MenuGrey">#1f253d</color>
     <color name="BannerBlue">#1d2032</color>
     <color name="ActionBarBlue">#10a8ab</color>
+    <color name="BouncyBlue">#1fa4c7</color>
     <color name="VeryLightGrey">#d8d8d8</color>
     <color name="DimGrey">#f2f4f6</color>
     <color name="PageGrey">#f3f7f9</color>
@@ -56,7 +57,7 @@
     <color name="playlist">#87898d</color>
     <color name="playlist_submenu">#abb2b9</color>
 
-    <color name="accent_500">#E91E63</color>
+    <color name="accent">#E91E63</color>
 
     <color name="header_section">#07101a</color>
     <color name="menu_items">#0d1c2e</color>

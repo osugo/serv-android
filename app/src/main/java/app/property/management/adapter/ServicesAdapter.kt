@@ -1,6 +1,7 @@
 package app.property.management.adapter
 
 import android.content.Context
+import android.graphics.Color
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -25,7 +26,7 @@ class ServicesAdapter(private val context: Context, private val services : Realm
     }
 
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
-        holder?.bindItems(services[position], context, clickListener)
+        holder?.bindItems(services[position], context, clickListener, isSelected(position))
     }
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
@@ -36,26 +37,23 @@ class ServicesAdapter(private val context: Context, private val services : Realm
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
 
-        var clickListener: ClickListener? = null
+        private var clickListener: ClickListener? = null
 
         override fun onClick(view: View?) {
             clickListener?.onItemClicked(adapterPosition)
         }
 
-        fun bindItems(offeredService: OfferedService, context: Context, clickListener: ClickListener){
-            val background = itemView.findViewById<ImageView>(R.id.background)
-            val name = itemView.findViewById<TextView>(R.id.name)
-            val layout = itemView.findViewById<FrameLayout>(R.id.layout)
-
+        fun bindItems(offeredService: OfferedService, context: Context, clickListener: ClickListener, isSelected: Boolean){
             this.clickListener = clickListener
 
-            Glide.with(context).load(R.drawable.apart_five).bitmapTransform(BlurTransformation(context)).into(background)
+            val name = itemView.findViewById<TextView>(R.id.name)
             name.text = offeredService.service
-
-            layout.setOnClickListener(this)
+            name.setOnClickListener(this)
+            name.setBackgroundResource(if(isSelected) R.drawable.service_item_background_selected else R.drawable.service_item_background_normal)
+            name.setTextColor(if(isSelected) Color.WHITE else context.resources.getColor(R.color.textColorPrimary))
         }
 
-        public interface ClickListener {
+        interface ClickListener {
             fun onItemClicked(position: Int)
         }
     }

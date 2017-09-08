@@ -15,7 +15,7 @@ class PropertyAdapter : RecyclerView.Adapter<PropertyAdapter.ViewHolder>() {
 
     private var properties : ArrayList<Property>? = ArrayList()
 
-    public fun setData(propertyList : ArrayList<Property>){
+    fun setData(propertyList : ArrayList<Property>){
         if(properties != null){
             properties!!.clear()
             properties!!.addAll(propertyList)

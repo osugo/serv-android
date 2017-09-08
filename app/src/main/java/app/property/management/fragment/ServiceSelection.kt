@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.support.v4.app.DialogFragment
 import android.support.v4.app.Fragment
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.*
 import android.widget.Button
 import android.widget.EditText
@@ -15,15 +14,11 @@ import app.property.management.R
 import app.property.management.adapter.ServicesAdapter
 import app.property.management.dialog.InfoDialog
 import app.property.management.model.OfferedService
-import app.property.management.model.Request
 import app.property.management.util.RealmUtil
 import com.google.android.flexbox.*
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog
 import io.realm.Realm
 import io.realm.RealmList
-import io.realm.exceptions.RealmException
-import kotlinx.android.synthetic.main.description_layout.*
-import org.jetbrains.anko.support.v4.toast
 import java.util.*
 
 /**

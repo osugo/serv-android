@@ -1,13 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/name"
-    android:layout_width="wrap_content"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/service_background"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="7dp"
-    android:background="@drawable/service_item_background_normal"
-    android:ellipsize="end"
-    android:maxLines="2"
-    android:padding="10dp"
-    android:textColor="@color/textColorPrimary"
-    android:textSize="18sp"
-    android:textStyle="bold" />
+    android:layout_marginStart="40dp"
+    android:layout_marginTop="5dp"
+    android:background="@color/ActionBarBlue"
+    android:padding="15dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ELECTRICAL SERVICES"
+        android:textAllCaps="true"
+        android:id="@+id/service"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="@android:color/white"
+        android:textStyle="bold" />
+
+</LinearLayout>

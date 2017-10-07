@@ -80,4 +80,6 @@
     <color name="nowPlayingBackground">#80000000</color>
     <color name="shareTextColor">@color/app_theme</color>
     <color name="excerptTextColor">@color/filter</color>
+
+
 </resources>

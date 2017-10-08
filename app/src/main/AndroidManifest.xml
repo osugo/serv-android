@@ -15,7 +15,11 @@
 
         <meta-data
             android:name="io.fabric.ApiKey"
-            android:value="069fc5277125b94ad2d9806c7015774e75bfec79" />
+            android:value="@string/fabric_key" />
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/places_key"/>
 
         <activity
             android:name=".activity.Login"
@@ -31,8 +35,11 @@
             android:label="Property Details"
             android:launchMode="singleTop" />
         <activity
-            android:name=".activity.Requests"
-            android:label="Services" />
+            android:name=".activity.Details"
+            android:label="" />
+        <activity
+            android:name=".activity.ServiceChooser"
+            android:label="Choose Service" />
 
     </application>
 

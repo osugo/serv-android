@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/descriptionLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -10,55 +11,42 @@
         android:layout_height="wrap_content"
         android:background="#e2e2e2"
         android:padding="15dp"
-        android:text="Ac Maintenance"
+        android:text="@string/describe_issue"
         android:textSize="18sp" />
 
     <TextView
+        android:id="@+id/descriptionTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/title"
         android:layout_marginEnd="15dp"
         android:layout_marginStart="15dp"
         android:layout_marginTop="20dp"
-        android:text="@string/describe_issue"
+        android:text="Description"
         android:textSize="16sp" />
 
     <EditText
         android:id="@+id/problemDescription"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/descriptionTitle"
         android:layout_marginEnd="15dp"
         android:layout_marginStart="15dp"
         android:layout_marginTop="7dp"
+        android:background="@drawable/text_bg"
         android:imeOptions="actionDone"
         android:inputType="textMultiLine|textCapSentences"
-        android:maxLines="3" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="15dp"
-        android:layout_marginStart="15dp"
-        android:layout_marginTop="10dp"
-        android:text="@string/schedule_time"
-        android:textSize="16sp" />
-
-    <EditText
-        android:id="@+id/date"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="15dp"
-        android:layout_marginStart="15dp"
-        android:layout_marginTop="7dp"
-        android:imeOptions="actionDone"
-        android:inputType="date" />
+        android:lines="5"
+        android:maxLines="5" />
 
     <Button
-        android:id="@+id/done"
+        android:id="@+id/proceed"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="15dp"
         android:background="@color/ProminentBlue"
         android:text="Done"
         android:textColor="@android:color/white" />
 
-</LinearLayout>
+</RelativeLayout>

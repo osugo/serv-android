@@ -37,6 +37,18 @@ class PropertySelection : AppCompatActivity(), View.OnClickListener, RadioGroup.
         val TAG: String = PropertySelection::class.java.simpleName
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.property_selection)
+
+        setSupportActionBar(toolbar)
+
+        realm = Realm.getInstance(RealmUtil.getRealmConfig())
+
+        proceed.setOnClickListener(this)
+        propertyType.setOnCheckedChangeListener(this)
+    }
+
     override fun onCheckedChanged(radioGroup: RadioGroup, checkedId: Int) {
         typeOfProperty = getPropertyTypeFromId(checkedId)
     }
@@ -81,7 +93,7 @@ class PropertySelection : AppCompatActivity(), View.OnClickListener, RadioGroup.
             } catch (e: RealmException) {
                 Log.e(TAG, e.message, e)
             } finally {
-                startActivity(Intent(this, Requests::class.java).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))
+                startActivity(Intent(this, ServiceChooser::class.java).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))
                 finish()
             }
         }
@@ -106,18 +118,6 @@ class PropertySelection : AppCompatActivity(), View.OnClickListener, RadioGroup.
         }
 
         return type
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.property_selection)
-
-        setSupportActionBar(toolbar)
-
-        realm = Realm.getInstance(RealmUtil.getRealmConfig())
-
-        proceed.setOnClickListener(this)
-        propertyType.setOnCheckedChangeListener(this)
     }
 
     override fun onDestroy() {

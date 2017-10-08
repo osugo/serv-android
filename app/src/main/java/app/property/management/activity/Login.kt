@@ -9,8 +9,9 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.View
 import android.view.WindowManager
+import android.widget.Toast
 import app.property.management.R
-import app.property.management.model.Property
+import app.property.management.model.OfferedService
 import app.property.management.model.User
 import app.property.management.util.RealmUtil
 import com.bumptech.glide.Glide
@@ -20,8 +21,11 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.SignInButton
 import com.google.android.gms.common.api.GoogleApiClient
+import io.reactivex.Completable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import io.realm.Realm
-import io.realm.RealmResults
+import io.realm.RealmList
 import io.realm.exceptions.RealmException
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlin.properties.Delegates
@@ -128,25 +132,25 @@ class Login : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, V
 
             Log.e("User", "$name is now logged in")
 
-            try {
-                realm.executeTransaction {
-                    val user = User(id, name, email, picture.toString())
-                    realm.copyToRealmOrUpdate(user)
+            Completable.fromAction {
+                try {
+                    realm.executeTransaction { r ->
+                        val user = User(id, name, email, picture.toString())
+                        r.copyToRealmOrUpdate(user)
+                    }
+                } catch (e: RealmException) {
+                    Log.e(TAG, e.message, e)
                 }
-            } catch (e: RealmException) {
-                Log.e(TAG, e.message, e)
-            } finally {
-                val results: RealmResults<Property> = realm.where(Property::class.java).findAll()
-
-                if (results.isNotEmpty()) {
-                    startActivity(Intent(this, Requests::class.java).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))
-                    finish()
-                }
-                else {
-                    startActivity(Intent(this, PropertySelection::class.java).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP))
-                    finish()
-                }
-            }
+            }.subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({
+                        addServices()
+                    }, {
+                        throwable ->
+                        Toast.makeText(this, throwable.message, Toast.LENGTH_SHORT).show()
+                        Log.e(TAG, throwable.message, throwable)
+                    }
+                    )
         } else {
             // Signed out, show unauthenticated UI.
         }
@@ -186,4 +190,24 @@ class Login : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, V
         realm.close()
     }
 
+    private fun addServices() {
+        val services: RealmList<OfferedService> = RealmList()
+        services.add(OfferedService("Electrical Services", null))
+        services.add(OfferedService("Lift Services", null))
+        services.add(OfferedService("Plumbing Services", null))
+        services.add(OfferedService("Fumigation Services", null))
+        services.add(OfferedService("AC Maintenance Services", null))
+        services.add(OfferedService("Property Inspection Services", null))
+        services.add(OfferedService("Handyman Services", null))
+        services.add(OfferedService("Ground Maintenance Services", null))
+
+        try {
+            realm.executeTransaction { r -> r.copyToRealmOrUpdate(services) }
+        } catch (ex: RealmException) {
+            Log.e(TAG, ex.message, ex)
+        } finally {
+            startActivity(Intent(this, PropertySelection::class.java).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP))
+            finish()
+        }
+    }
 }

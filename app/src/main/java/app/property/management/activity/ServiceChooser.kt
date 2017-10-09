@@ -7,6 +7,7 @@ import app.property.management.R
 import app.property.management.adapter.ServiceChooserAdapter
 import app.property.management.model.OfferedService
 import app.property.management.util.RealmUtil
+import com.bumptech.glide.Glide
 import io.realm.Realm
 import kotlinx.android.synthetic.main.service_selection_layout.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -28,7 +29,7 @@ class ServiceChooser : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setHomeButtonEnabled(true)
 
-        background.setActualImageResource(R.drawable.apart_three)
+        Glide.with(this).load(R.drawable.apart_six).into(background)
 
         categories.layoutManager = LinearLayoutManager(this)
 

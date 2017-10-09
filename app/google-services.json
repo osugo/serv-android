@@ -1,33 +1,33 @@
 {
   "project_info": {
-    "project_number": "275400286091",
-    "project_id": "house-4d0b9"
+    "project_number": "720975893323",
+    "project_id": "house-1507483801931"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:275400286091:android:d7f9d473df030ace",
+        "mobilesdk_app_id": "1:720975893323:android:d7f9d473df030ace",
         "android_client_info": {
           "package_name": "app.property.management"
         }
       },
       "oauth_client": [
         {
-          "client_id": "275400286091-26f05mlkkd9h1i18fh6uharnl9f4r1ft.apps.googleusercontent.com",
+          "client_id": "720975893323-6iqe8sm5i1uiunq8kdja4qmnr7tdlges.apps.googleusercontent.com",
           "client_type": 3
         },
         {
-          "client_id": "275400286091-n0p9ts1ps6a5ivjtl7a40nb67gqduvl4.apps.googleusercontent.com",
+          "client_id": "720975893323-m53lvo0ohl6d2qvotemlfa2go7c779bg.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "app.property.management",
-            "certificate_hash": "8e72c9acdd3d9f65b8775d7378b0ea7ea898bca0"
+            "certificate_hash": "c5bf5db11ff2fbb7887879e92c4ef3f545aeaed4"
           }
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBuXGFk-9eVnC96VrthrO16ovUlpzMRbeg"
+          "current_key": "AIzaSyDd_afXBIcAvzp8eXqFemik6oma6YPEDTk"
         }
       ],
       "services": {

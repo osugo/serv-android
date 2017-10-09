@@ -19,7 +19,7 @@ import io.realm.RealmResults
  */
 class ServiceChooserAdapter(private val context: Context, private val services: RealmResults<OfferedService>) : RecyclerView.Adapter<ServiceChooserAdapter.ViewHolder>() {
 
-    val colors = arrayOf("#90FF4081", "#9000c61e", "#90bdd000", "#90ed215d", "#90ee5837", "#9058d093", "#90ff9041", "#901fa4c7")
+    val colors = arrayOf("#99FF4081", "#9900c61e", "#99bdd000", "#99ed215d", "#99ee5837", "#9958d093", "#99ff9041", "#991fa4c7")
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent?.context).inflate(R.layout.service_layout_item, parent, false)

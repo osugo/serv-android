@@ -27,7 +27,6 @@
                 android:id="@+id/header"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/apart_five"
                 android:fitsSystemWindows="true"
                 android:scaleType="centerCrop"
                 app:layout_collapseParallaxMultiplier="0.75"
@@ -38,6 +37,13 @@
                 android:layout_height="match_parent"
                 android:alpha="0.7"
                 android:background="@color/BouncyBlue"
+                android:fitsSystemWindows="true" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:alpha="0.1"
+                android:background="#000"
                 android:fitsSystemWindows="true" />
 
             <android.support.v7.widget.Toolbar
@@ -57,6 +63,7 @@
                 app:tabIndicatorColor="@android:color/white"
                 app:tabSelectedTextColor="@android:color/white"
                 app:tabTextAppearance="@style/TextAppearance.AppCompat.Medium"
+                app:tabIndicatorHeight="2dp"
                 app:tabTextColor="@android:color/white" />
 
         </android.support.design.widget.CollapsingToolbarLayout>

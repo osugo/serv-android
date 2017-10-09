@@ -23,7 +23,6 @@ import com.google.android.gms.common.SignInButton
 import com.google.android.gms.common.api.GoogleApiClient
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 import io.realm.Realm
 import io.realm.RealmList
 import io.realm.exceptions.RealmException
@@ -141,7 +140,7 @@ class Login : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, V
                 } catch (e: RealmException) {
                     Log.e(TAG, e.message, e)
                 }
-            }.subscribeOn(Schedulers.io())
+            }.subscribeOn(AndroidSchedulers.mainThread())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({
                         addServices()
@@ -206,7 +205,7 @@ class Login : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, V
         } catch (ex: RealmException) {
             Log.e(TAG, ex.message, ex)
         } finally {
-            startActivity(Intent(this, PropertySelection::class.java).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP))
+            startActivity(Intent(this, ServiceChooser::class.java).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP))
             finish()
         }
     }

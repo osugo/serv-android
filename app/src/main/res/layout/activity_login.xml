@@ -11,6 +11,12 @@
         android:layout_height="match_parent"
         android:scaleType="centerCrop" />
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:alpha="0.4"
+        android:background="@color/BouncyBlue" />
+
     <TextView
         android:id="@+id/name"
         android:layout_width="wrap_content"
@@ -27,6 +33,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:layout_margin="20dp" />
+        android:layout_margin="20dp"
+        android:textAllCaps="true" />
 
 </FrameLayout>

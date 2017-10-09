@@ -2,6 +2,7 @@ package app.property.management.adapter
 
 import android.content.Context
 import android.graphics.Color
+import android.support.v4.content.ContextCompat
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -46,7 +47,7 @@ class ServicesAdapter(private val context: Context, private val services : Realm
             name.text = offeredService.title
             name.setOnClickListener(this)
             name.setBackgroundResource(if(isSelected) R.drawable.service_item_background_selected else R.drawable.service_item_background_normal)
-            name.setTextColor(if(isSelected) Color.WHITE else context.resources.getColor(R.color.textColorPrimary))
+            name.setTextColor(if(isSelected) Color.WHITE else ContextCompat.getColor(context, R.color.textColorPrimary))
         }
 
         interface ClickListener {

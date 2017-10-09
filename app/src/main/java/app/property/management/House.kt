@@ -1,12 +1,11 @@
 package app.property.management
 
 import android.app.Application
+import android.content.Context
 import app.property.management.util.RealmUtil
-import com.crashlytics.android.Crashlytics
 import com.crashlytics.android.answers.Answers
 import io.fabric.sdk.android.Fabric
 import io.realm.Realm
-import io.realm.RealmConfiguration
 
 /**
  * Created by kombo on 21/08/2017.
@@ -14,8 +13,12 @@ import io.realm.RealmConfiguration
 
 class House : Application() {
 
+    public lateinit var INSTANCE: Context
+
     override fun onCreate() {
         super.onCreate()
+
+        INSTANCE = this
 
         Realm.init(this)
         Realm.setDefaultConfiguration(RealmUtil.getRealmConfig())
@@ -23,4 +26,6 @@ class House : Application() {
 //        Fabric.with(this, Crashlytics(), Answers())
         Fabric.with(this, Answers())
     }
+
+    public fun getContext(): Context = INSTANCE
 }

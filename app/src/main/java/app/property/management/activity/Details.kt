@@ -10,6 +10,7 @@ import app.property.management.R
 import app.property.management.fragment.DetailsFragment
 import app.property.management.model.OfferedService
 import app.property.management.util.RealmUtil
+import com.bumptech.glide.Glide
 import io.realm.Realm
 import kotlinx.android.synthetic.main.details.*
 
@@ -36,10 +37,13 @@ class Details : AppCompatActivity() {
         supportActionBar?.setHomeButtonEnabled(true)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
+        Glide.with(this).load(R.drawable.apart_six).into(header)
+
         setUpViewPager()
         tabLayout.setupWithViewPager(viewPager)
         viewPager.currentItem = intent.getIntExtra(SELECTED_SERVICE, 0)
 
+        tabLayout.tabMode = TabLayout.MODE_SCROLLABLE
         tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabReselected(tab: TabLayout.Tab?) {
             }

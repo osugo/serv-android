@@ -16,4 +16,7 @@
 
     <string name="places_key">AIzaSyDseWgMUQqZCmiLqBYCL0PUW97ka4-Uvd8</string>
     <string name="fabric_key">069fc5277125b94ad2d9806c7015774e75bfec79</string>
+
+    <string name="facebook_app_id">170109426876529</string>
+    <string name="fb_login_protocol_scheme">fb170109426876529</string>
 </resources>

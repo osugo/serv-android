@@ -11,8 +11,8 @@ android {
         applicationId "app.property.management"
         minSdkVersion 19
         targetSdkVersion 26
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "0.0.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
@@ -43,6 +43,7 @@ dependencies {
     compile 'com.google.android.gms:play-services-maps:11.4.2'
     compile 'com.google.android.gms:play-services-places:11.4.2'
     compile "org.jetbrains.anko:anko:0.10.1"
+    compile 'com.facebook.android:facebook-android-sdk:4.19.0'
 //    compile 'jp.wasabeef:glide-transformations:2.0.2'
 //    compile 'com.google.android:flexbox:0.3.0-alpha3'
 //    compile 'com.wdullaer:materialdatetimepicker:3.1.3'

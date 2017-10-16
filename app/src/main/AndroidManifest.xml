@@ -15,11 +15,11 @@
 
         <meta-data
             android:name="io.fabric.ApiKey"
-            android:value="@string/fabric_key" />
+            android:value="069fc5277125b94ad2d9806c7015774e75bfec79" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="@string/places_key"/>
+            android:value="@string/places_key" />
 
         <activity
             android:name=".activity.Login"
@@ -41,6 +41,26 @@
             android:name=".activity.ServiceChooser"
             android:label="Choose Service" />
 
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id" />
+
+        <activity
+            android:name="com.facebook.FacebookActivity"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            android:label="@string/app_name" />
+        <activity
+            android:name="com.facebook.CustomTabActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="@string/fb_login_protocol_scheme" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

@@ -4,6 +4,8 @@ import android.app.Application
 import android.content.Context
 import app.property.management.util.RealmUtil
 import com.crashlytics.android.answers.Answers
+import com.facebook.FacebookSdk
+import com.facebook.appevents.AppEventsLogger
 import io.fabric.sdk.android.Fabric
 import io.realm.Realm
 
@@ -17,6 +19,9 @@ class House : Application() {
 
     override fun onCreate() {
         super.onCreate()
+
+        FacebookSdk.sdkInitialize(applicationContext)
+        AppEventsLogger.activateApp(this)
 
         INSTANCE = this
 

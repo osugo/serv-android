@@ -14,7 +14,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:alpha="0.4"
+        android:alpha="0.6"
         android:background="@color/BouncyBlue" />
 
     <TextView
@@ -27,6 +27,14 @@
         android:textColor="@android:color/white"
         android:textSize="35sp"
         android:textStyle="bold" />
+
+    <com.facebook.login.widget.LoginButton
+        android:id="@+id/login_button"
+        android:layout_width="wrap_content"
+        android:layout_height="45dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="30dp" />
 
     <com.google.android.gms.common.SignInButton
         android:id="@+id/sign_in_button"

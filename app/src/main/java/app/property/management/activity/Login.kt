@@ -15,6 +15,9 @@ import app.property.management.model.OfferedService
 import app.property.management.model.User
 import app.property.management.util.RealmUtil
 import com.bumptech.glide.Glide
+import com.facebook.*
+import com.facebook.login.LoginManager
+import com.facebook.login.LoginResult
 import com.google.android.gms.auth.api.Auth
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.auth.api.signin.GoogleSignInResult
@@ -27,48 +30,105 @@ import io.realm.Realm
 import io.realm.RealmList
 import io.realm.exceptions.RealmException
 import kotlinx.android.synthetic.main.activity_login.*
+import org.jetbrains.anko.toast
+import org.json.JSONObject
+import java.util.*
 import kotlin.properties.Delegates
 
 class Login : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
 
-    override fun onClick(view: View?) {
-        when (view?.id) {
-            R.id.sign_in_button -> signIn()
-        }
-    }
-
     private var realm: Realm by Delegates.notNull()
-
-    override fun onConnectionFailed(connectionResult: ConnectionResult) {
-        // An unresolvable error has occurred and Google APIs (including Sign-In) will not be available.
-        Log.d(TAG, "onConnectionFailed:" + connectionResult);
-    }
-
     private var googleApiClient: GoogleApiClient? = null
     private var progressDialog: ProgressDialog? = null
+    lateinit var callbackManager: CallbackManager
 
     companion object {
         val TAG: String = "Login"
         val RC_SIGN_IN = 9001
     }
 
+
+    override fun onClick(view: View?) {
+        when (view?.id) {
+            R.id.google -> signIn()
+            R.id.facebook -> {
+                LoginManager.getInstance().registerCallback(callbackManager, object : FacebookCallback<LoginResult> {
+
+                    override fun onError(error: FacebookException?) {
+                        toast("An error occurred during login: " + error?.message)
+                        hideProgressDialog()
+                    }
+
+                    override fun onCancel() {
+                        toast("Facebook login cancelled")
+                        hideProgressDialog()
+                    }
+
+                    override fun onSuccess(result: LoginResult?) {
+                        val graphRequest: GraphRequest = GraphRequest.newMeRequest(result?.accessToken) { `object`, _ ->
+                            val userId = `object`?.getString("id")
+                            val firstName = `object`?.getString("first_name")
+                            val lastName = `object`?.getString("last_name")
+                            val email = `object`?.getString("email")
+                            val profilePicture = "https://graph.facebook.com/$userId/picture?width=500&height=500"
+
+                            val name = firstName + " " + lastName
+
+                            Completable.fromAction {
+                                try {
+                                    realm.executeTransaction { r ->
+                                        val user = User(userId, name, email, profilePicture)
+                                        r.copyToRealmOrUpdate(user)
+                                    }
+                                } catch (e: RealmException) {
+                                    Log.e(TAG, e.message, e)
+                                }
+                            }.subscribeOn(AndroidSchedulers.mainThread())
+                                    .observeOn(AndroidSchedulers.mainThread())
+                                    .subscribe({
+                                        addServices()
+                                    }, {
+                                        throwable ->
+                                        Toast.makeText(this@Login, throwable.message, Toast.LENGTH_SHORT).show()
+                                        Log.e(TAG, throwable.message, throwable)
+                                    }
+                                    )
+                        }
+
+                        val parameters = Bundle()
+                        parameters.putString("fields", "id, first_name, last_name, email")
+                        graphRequest.parameters = parameters
+                        graphRequest.executeAsync()
+                    }
+                })
+
+                LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile, email"))
+            }
+        }
+    }
+
+    override fun onConnectionFailed(connectionResult: ConnectionResult) {
+        // An unresolvable error has occurred and Google APIs (including Sign-In) will not be available.
+        Log.d(TAG, "onConnectionFailed:" + connectionResult);
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         window.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
         super.onCreate(savedInstanceState)
-
         setContentView(R.layout.activity_login)
 
         realm = Realm.getInstance(RealmUtil.getRealmConfig())
 
         val googleSignInOptions: GoogleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build()
-
         googleApiClient = GoogleApiClient.Builder(this).enableAutoManage(this, this).addApi(Auth.GOOGLE_SIGN_IN_API, googleSignInOptions).build()
 
-        sign_in_button.setSize(SignInButton.SIZE_STANDARD)
-        sign_in_button.setOnClickListener(this)
+        callbackManager = CallbackManager.Factory.create()
+
+        google.setSize(SignInButton.SIZE_STANDARD)
+        google.setOnClickListener(this)
+        facebook.setOnClickListener(this)
 
         background.setColorFilter(Color.parseColor("#50000000"), PorterDuff.Mode.ADD)
-
         Glide.with(this).load(R.drawable.apart_one).centerCrop().error(android.R.color.darker_gray).into(background)
     }
 
@@ -112,6 +172,7 @@ class Login : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, V
                 val googleSignInResult: GoogleSignInResult = Auth.GoogleSignInApi.getSignInResultFromIntent(data)
                 handleSignInResult(googleSignInResult)
             }
+            else -> callbackManager.onActivityResult(requestCode, resultCode, data)
         }
     }
 

@@ -1,7 +1,7 @@
 package app.property.management
 
-import android.app.Application
 import android.content.Context
+import android.support.multidex.MultiDexApplication
 import app.property.management.util.RealmUtil
 import com.crashlytics.android.answers.Answers
 import com.facebook.FacebookSdk
@@ -13,7 +13,7 @@ import io.realm.Realm
  * Created by kombo on 21/08/2017.
  */
 
-class House : Application() {
+class House : MultiDexApplication() {
 
     public lateinit var INSTANCE: Context
 

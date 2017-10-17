@@ -47,7 +47,6 @@ class Login : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, V
         val RC_SIGN_IN = 9001
     }
 
-
     override fun onClick(view: View?) {
         when (view?.id) {
             R.id.google -> signIn()

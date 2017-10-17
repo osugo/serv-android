@@ -73,25 +73,7 @@ class Login : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, V
 
                             val name = firstName + " " + lastName
 
-                            Completable.fromAction {
-                                try {
-                                    realm.executeTransaction { r ->
-                                        val user = User(userId, name, email, profilePicture)
-                                        r.copyToRealmOrUpdate(user)
-                                    }
-                                } catch (e: RealmException) {
-                                    Log.e(TAG, e.message, e)
-                                }
-                            }.subscribeOn(AndroidSchedulers.mainThread())
-                                    .observeOn(AndroidSchedulers.mainThread())
-                                    .subscribe({
-                                        addServices()
-                                    }, {
-                                        throwable ->
-                                        Toast.makeText(this@Login, throwable.message, Toast.LENGTH_SHORT).show()
-                                        Log.e(TAG, throwable.message, throwable)
-                                    }
-                                    )
+                            createUser(userId!!, name, email!!, profilePicture)
                         }
 
                         val parameters = Bundle()
@@ -191,28 +173,32 @@ class Login : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, V
 
             Log.e("User", "$name is now logged in")
 
-            Completable.fromAction {
-                try {
-                    realm.executeTransaction { r ->
-                        val user = User(id, name, email, picture.toString())
-                        r.copyToRealmOrUpdate(user)
-                    }
-                } catch (e: RealmException) {
-                    Log.e(TAG, e.message, e)
-                }
-            }.subscribeOn(AndroidSchedulers.mainThread())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe({
-                        addServices()
-                    }, {
-                        throwable ->
-                        Toast.makeText(this, throwable.message, Toast.LENGTH_SHORT).show()
-                        Log.e(TAG, throwable.message, throwable)
-                    }
-                    )
+            createUser(id!!, name!!, email!!, picture.toString())
         } else {
             // Signed out, show unauthenticated UI.
         }
+    }
+
+    private fun createUser(id: String, name: String, email: String, picture: String){
+        Completable.fromAction {
+            try {
+                realm.executeTransaction { r ->
+                    val user = User(id, name, email, picture)
+                    r.copyToRealmOrUpdate(user)
+                }
+            } catch (e: RealmException) {
+                Log.e(TAG, e.message, e)
+            }
+        }.subscribeOn(AndroidSchedulers.mainThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    addServices()
+                }, {
+                    throwable ->
+                    Toast.makeText(this, throwable.message, Toast.LENGTH_SHORT).show()
+                    Log.e(TAG, throwable.message, throwable)
+                }
+                )
     }
 
     private fun signIn() {
@@ -265,7 +251,7 @@ class Login : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, V
         } catch (ex: RealmException) {
             Log.e(TAG, ex.message, ex)
         } finally {
-            startActivity(Intent(this, ServiceChooser::class.java).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP))
+            startActivity(Intent(this, PropertySelection::class.java).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP))
             finish()
         }
     }

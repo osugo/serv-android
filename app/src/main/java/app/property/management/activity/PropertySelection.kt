@@ -17,6 +17,7 @@ import app.property.management.adapter.PlaceAutocompleteAdapter
 import app.property.management.model.Property
 import app.property.management.model.User
 import app.property.management.util.RealmUtil
+import com.bumptech.glide.Glide
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.common.api.ResultCallback
@@ -73,6 +74,8 @@ class PropertySelection : AppCompatActivity(), View.OnClickListener, RadioGroup.
 
         adapter = PlaceAutocompleteAdapter(this, googleApiClient, BOUNDS_GREATER_SYDNEY, null)
         location.setAdapter(adapter)
+
+        Glide.with(this).load(R.drawable.apart_two).into(background)
     }
 
     override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {

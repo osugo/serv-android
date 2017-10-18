@@ -1,11 +1,13 @@
 package app.property.management.fragment
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import app.property.management.R
+import app.property.management.activity.PropertySelection
 import app.property.management.util.RealmUtil
 import io.realm.Realm
 import kotlinx.android.synthetic.main.description_layout.*
@@ -23,7 +25,7 @@ class DetailsFragment : Fragment() {
         val TAG = DetailsFragment::class.java.simpleName
         var SERVICE: String? = null
 
-        fun newInstance(title: String?) : Fragment{
+        fun newInstance(title: String?): Fragment {
             val fragment = DetailsFragment()
 
             val bundle = Bundle()
@@ -51,7 +53,10 @@ class DetailsFragment : Fragment() {
             dateLayout.visibility = View.VISIBLE
         }
 
-        done.setOnClickListener { toast("This does nothing for now. :)") }
+        done.setOnClickListener {
+            toast("Your request is being processed. We will contact you soon.)")
+            activity.startActivity(Intent(activity, PropertySelection::class.java))
+        }
     }
 
     override fun onDestroyView() {

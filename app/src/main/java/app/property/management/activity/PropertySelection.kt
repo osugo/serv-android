@@ -64,6 +64,8 @@ class PropertySelection : AppCompatActivity(), View.OnClickListener, RadioGroup.
         setContentView(R.layout.property_selection)
 
         setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setHomeButtonEnabled(true)
 
         realm = Realm.getInstance(RealmUtil.getRealmConfig())
 

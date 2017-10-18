@@ -19,7 +19,7 @@
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="@string/places_key" />
+            android:value="AIzaSyDseWgMUQqZCmiLqBYCL0PUW97ka4-Uvd8" />
 
         <activity
             android:name=".activity.Login"

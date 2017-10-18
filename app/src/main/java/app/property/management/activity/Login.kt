@@ -100,14 +100,19 @@ class Login : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, V
 
         realm = Realm.getInstance(RealmUtil.getRealmConfig())
 
-        val googleSignInOptions: GoogleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build()
-        googleApiClient = GoogleApiClient.Builder(this).enableAutoManage(this, this).addApi(Auth.GOOGLE_SIGN_IN_API, googleSignInOptions).build()
+        if (realm.where(User::class.java).findAll().isNotEmpty()) { //user is already logged in, proceed to app
+            startActivity(Intent(this, PropertySelection::class.java).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP))
+            finish()
+        } else {
+            val googleSignInOptions: GoogleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build()
+            googleApiClient = GoogleApiClient.Builder(this).enableAutoManage(this, this).addApi(Auth.GOOGLE_SIGN_IN_API, googleSignInOptions).build()
 
-        callbackManager = CallbackManager.Factory.create()
+            callbackManager = CallbackManager.Factory.create()
 
-        google.setSize(SignInButton.SIZE_STANDARD)
-        google.setOnClickListener(this)
-        facebook.setOnClickListener(this)
+            google.setSize(SignInButton.SIZE_STANDARD)
+            google.setOnClickListener(this)
+            facebook.setOnClickListener(this)
+        }
 
         background.setColorFilter(Color.parseColor("#50000000"), PorterDuff.Mode.ADD)
         Glide.with(this).load(R.drawable.apart_one).centerCrop().error(android.R.color.darker_gray).into(background)
@@ -179,7 +184,7 @@ class Login : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, V
         }
     }
 
-    private fun createUser(id: String, name: String, email: String, picture: String){
+    private fun createUser(id: String, name: String, email: String, picture: String) {
         Completable.fromAction {
             try {
                 realm.executeTransaction { r ->
@@ -193,8 +198,7 @@ class Login : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, V
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     addServices()
-                }, {
-                    throwable ->
+                }, { throwable ->
                     Toast.makeText(this, throwable.message, Toast.LENGTH_SHORT).show()
                     Log.e(TAG, throwable.message, throwable)
                 }

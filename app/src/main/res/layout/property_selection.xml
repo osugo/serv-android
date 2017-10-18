@@ -11,9 +11,9 @@
         android:layout_height="match_parent">
 
         <ImageView
+            android:id="@id/background"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@id/background"
             android:scaleType="centerCrop" />
 
         <View
@@ -22,87 +22,102 @@
             android:alpha="0.5"
             android:background="#000" />
 
-        <RelativeLayout
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginBottom="40dp"
-            android:layout_marginEnd="40dp"
-            android:layout_marginStart="40dp"
-            android:layout_marginTop="40dp"
-            android:background="@drawable/property_background"
-            android:orientation="vertical"
-            android:padding="10dp">
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="vertical">
 
-            <EditText
-                android:id="@+id/name"
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="30dp"
-                android:hint="Property name"
-                android:imeOptions="actionNext"
-                android:inputType="textCapWords" />
-
-            <AutoCompleteTextView
-                android:id="@+id/location"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/name"
-                android:layout_marginTop="15dp"
-                android:hint="Location"
-                android:imeOptions="actionDone"
-                android:inputType="textCapWords" />
-
-            <TextView
-                android:id="@+id/propertyTypeText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/location"
-                android:layout_marginBottom="5dp"
-                android:layout_marginTop="25dp"
-                android:text="Property Type"
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
-
-            <RadioGroup
-                android:id="@+id/propertyType"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/propertyTypeText"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="50dp"
+                android:layout_marginStart="50dp"
+                android:background="@drawable/property_background"
                 android:orientation="vertical"
-                android:padding="5dp">
+                android:padding="10dp">
 
-                <RadioButton
-                    android:id="@+id/apartment"
+                <EditText
+                    android:id="@+id/name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="10dp"
+                    android:hint="Property name"
+                    android:imeOptions="actionNext"
+                    android:inputType="textCapWords" />
+
+                <AutoCompleteTextView
+                    android:id="@+id/location"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/name"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="15dp"
+                    android:hint="Location"
+                    android:imeOptions="actionDone"
+                    android:inputType="textCapWords" />
+
+                <TextView
+                    android:id="@+id/propertyTypeText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:enabled="true"
-                    android:text="Apartments" />
+                    android:layout_below="@+id/location"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="25dp"
+                    android:text="Property Type"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
-                <RadioButton
-                    android:id="@+id/estate"
+                <RadioGroup
+                    android:id="@+id/propertyType"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Estate" />
+                    android:layout_below="@+id/propertyTypeText"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginStart="10dp"
+                    android:orientation="vertical"
+                    android:padding="5dp">
 
-                <RadioButton
-                    android:id="@+id/commercial"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Commercial" />
-            </RadioGroup>
+                    <RadioButton
+                        android:id="@+id/apartment"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:enabled="true"
+                        android:text="Apartments" />
+
+                    <RadioButton
+                        android:id="@+id/estate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Estate" />
+
+                    <RadioButton
+                        android:id="@+id/commercial"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Commercial" />
+                </RadioGroup>
+
+            </RelativeLayout>
 
             <Button
                 android:id="@+id/proceed"
                 android:layout_width="170dp"
                 android:layout_height="40dp"
-                android:layout_alignParentBottom="true"
-                android:background="@drawable/button_background"
-                android:layout_centerHorizontal="true"
+                android:layout_gravity="center_horizontal"
                 android:layout_marginBottom="10dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/button_background"
                 android:text="Proceed"
                 android:textColor="@android:color/white"
                 android:textStyle="bold" />
 
-        </RelativeLayout>
+        </LinearLayout>
 
     </FrameLayout>
 

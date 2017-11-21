@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/background"
     android:orientation="vertical">
 
     <app.property.management.view.SquareImageView
@@ -13,7 +14,7 @@
         app:srcCompat="@drawable/ic_electrical_services" />
 
     <TextView
-        android:id="@+id/title"
+        android:id="@+id/service"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/icon"

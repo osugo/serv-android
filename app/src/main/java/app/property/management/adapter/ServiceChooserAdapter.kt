@@ -8,10 +8,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.RelativeLayout
 import android.widget.TextView
 import app.property.management.R
 import app.property.management.activity.Details
 import app.property.management.model.OfferedService
+import app.property.management.view.SquareImageView
+import com.bumptech.glide.Glide
 import io.realm.RealmResults
 
 /**
@@ -19,27 +22,26 @@ import io.realm.RealmResults
  */
 class ServiceChooserAdapter(private val context: Context, private val services: RealmResults<OfferedService>) : RecyclerView.Adapter<ServiceChooserAdapter.ViewHolder>() {
 
-    private val colors = arrayOf("#99FF4081", "#9900c61e", "#99bdd000", "#99ed215d", "#99ee5837", "#9958d093", "#99ff9041", "#991fa4c7")
-
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent?.context).inflate(R.layout.service_layout_item, parent, false)
+        val view = LayoutInflater.from(parent?.context).inflate(R.layout.service_selection, parent, false)
         return ViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
-        holder?.bindItems(context, services[holder.adapterPosition], colors[holder.adapterPosition], holder.adapterPosition)
+        holder?.bindItems(context, services[holder.adapterPosition], holder.adapterPosition)
     }
 
     override fun getItemCount(): Int = services.size
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        fun bindItems(context: Context, offeredService: OfferedService, color: String, position: Int) {
-            val background = itemView.findViewById<LinearLayout>(R.id.service_background)
+        fun bindItems(context: Context, offeredService: OfferedService, position: Int) {
+            val background = itemView.findViewById<RelativeLayout>(R.id.background)
             val service = itemView.findViewById<TextView>(R.id.service)
+            val icon = itemView.findViewById<SquareImageView>(R.id.icon)
 
             service.text = offeredService.title
-            background.setBackgroundColor(Color.parseColor(color))
+            Glide.with(context).load(offeredService.icon).centerCrop().into(icon)
 
             background.setOnClickListener {
                 context.startActivity(Intent(context, Details::class.java).putExtra(Details.SELECTED_SERVICE, position))

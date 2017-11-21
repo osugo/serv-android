@@ -240,14 +240,14 @@ class Login : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, V
 
     private fun addServices() {
         val services: RealmList<OfferedService> = RealmList()
-        services.add(OfferedService("Electrical Services", null))
-        services.add(OfferedService("Lift Services", null))
-        services.add(OfferedService("Plumbing Services", null))
-        services.add(OfferedService("Fumigation Services", null))
-        services.add(OfferedService("AC Maintenance Services", null))
-        services.add(OfferedService("Property Inspection Services", null))
-        services.add(OfferedService("Handyman Services", null))
-        services.add(OfferedService("Ground Maintenance Services", null))
+        services.add(OfferedService("Electrical Services", null, R.drawable.ic_electrical_services))
+        services.add(OfferedService("Lift Services", null, R.drawable.ic_lift_services))
+        services.add(OfferedService("Plumbing Services", null, R.drawable.ic_plumbing_services))
+        services.add(OfferedService("Fumigation Services", null, R.drawable.ic_fumigation_services))
+        services.add(OfferedService("AC Maintenance Services", null, R.drawable.ic_ac_services))
+        services.add(OfferedService("Property Inspection Services", null, R.drawable.ic_property_inspection))
+        services.add(OfferedService("Handyman Services", null, R.drawable.ic_handyman_services))
+        services.add(OfferedService("Ground Maintenance Services", null, R.drawable.ic_ground_maintenance))
 
         try {
             realm.executeTransaction { r -> r.copyToRealmOrUpdate(services) }

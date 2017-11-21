@@ -2,6 +2,7 @@ package app.property.management.activity
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import app.property.management.R
 import app.property.management.adapter.ServiceChooserAdapter
@@ -31,11 +32,11 @@ class ServiceChooser : AppCompatActivity() {
 
         Glide.with(this).load(R.drawable.apart_six).into(background)
 
-        categories.layoutManager = LinearLayoutManager(this)
+        categories.layoutManager = GridLayoutManager(this, 2)
 
         val services = realm.where(OfferedService::class.java).findAll()
 
-        if(services.isNotEmpty()) {
+        if (services.isNotEmpty()) {
             val adapter = ServiceChooserAdapter(this, services)
             categories.adapter = adapter
         }

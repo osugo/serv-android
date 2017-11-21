@@ -31,7 +31,6 @@ import io.realm.RealmList
 import io.realm.exceptions.RealmException
 import kotlinx.android.synthetic.main.activity_login.*
 import org.jetbrains.anko.toast
-import org.json.JSONObject
 import java.util.*
 import kotlin.properties.Delegates
 
@@ -40,7 +39,7 @@ class Login : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, V
     private var realm: Realm by Delegates.notNull()
     private var googleApiClient: GoogleApiClient? = null
     private var progressDialog: ProgressDialog? = null
-    lateinit var callbackManager: CallbackManager
+    private lateinit var callbackManager: CallbackManager
 
     companion object {
         val TAG: String = "Login"

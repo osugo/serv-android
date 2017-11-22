@@ -18,6 +18,10 @@ import kotlinx.android.synthetic.main.toolbar.*
  */
 class ServiceChooser : AppCompatActivity() {
 
+    companion object {
+        val PROPERTY_NAME = "name"
+    }
+
     lateinit var realm: Realm
 
     override fun onCreate(savedInstanceState: Bundle?) {

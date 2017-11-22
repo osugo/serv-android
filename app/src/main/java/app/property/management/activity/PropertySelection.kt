@@ -91,8 +91,7 @@ class PropertySelection : AppCompatActivity(), View.OnClickListener, RadioGroup.
              Issue a request to the Places Geo Data API to retrieve a Place object with additional
              details about the place.
               */
-        val placeResult = Places.GeoDataApi
-                .getPlaceById(googleApiClient, placeId)
+        val placeResult = Places.GeoDataApi.getPlaceById(googleApiClient, placeId)
         placeResult.setResultCallback(updatePlaceDetailsCallback)
 
         Toast.makeText(applicationContext, "Clicked: " + primaryText, Toast.LENGTH_SHORT).show()

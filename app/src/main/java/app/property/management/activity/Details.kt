@@ -82,9 +82,7 @@ class Details : AppCompatActivity() {
             titles.add(title!!)
         }
 
-        override fun getPageTitle(position: Int): CharSequence {
-            return titles[position]
-        }
+        override fun getPageTitle(position: Int): CharSequence = titles[position]
     }
 
     override fun onDestroy() {

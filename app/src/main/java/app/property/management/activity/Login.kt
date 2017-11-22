@@ -12,6 +12,7 @@ import android.view.WindowManager
 import android.widget.Toast
 import app.property.management.R
 import app.property.management.model.OfferedService
+import app.property.management.model.Property
 import app.property.management.model.User
 import app.property.management.util.RealmUtil
 import com.bumptech.glide.Glide
@@ -249,13 +250,19 @@ class Login : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, V
         services.add(OfferedService("Handyman Services", null, R.drawable.ic_handyman_services))
         services.add(OfferedService("Ground Maintenance Services", null, R.drawable.ic_ground_maintenance))
 
-        try {
-            realm.executeTransaction { r -> r.copyToRealmOrUpdate(services) }
-        } catch (ex: RealmException) {
-            Log.e(TAG, ex.message, ex)
-        } finally {
-            startActivity(Intent(this, PropertySelection::class.java).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP))
+        Completable.fromAction({
+            try {
+                realm.executeTransaction { r -> r.copyToRealmOrUpdate(services) }
+            } catch (ex: RealmException) {
+                Log.e(TAG, ex.message, ex)
+            }
+        }).subscribe({
+            if (realm.where(Property::class.java).findAll().isNotEmpty())
+                startActivity(Intent(this, Properties::class.java))
+            else
+                startActivity(Intent(this, PropertySelection::class.java).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP))
+
             finish()
-        }
+        })
     }
 }

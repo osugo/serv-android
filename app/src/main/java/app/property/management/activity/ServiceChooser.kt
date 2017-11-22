@@ -7,6 +7,7 @@ import android.support.v7.widget.LinearLayoutManager
 import app.property.management.R
 import app.property.management.adapter.ServiceChooserAdapter
 import app.property.management.model.OfferedService
+import app.property.management.model.Property
 import app.property.management.util.RealmUtil
 import com.bumptech.glide.Glide
 import io.realm.Realm
@@ -17,6 +18,8 @@ import kotlinx.android.synthetic.main.toolbar.*
  * Created by kombo on 07/10/2017.
  */
 class ServiceChooser : AppCompatActivity() {
+
+    lateinit var property: Property
 
     companion object {
         val PROPERTY_NAME = "name"
@@ -34,6 +37,8 @@ class ServiceChooser : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setHomeButtonEnabled(true)
 
+        val name = intent.getStringExtra(PROPERTY_NAME)
+
         Glide.with(this).load(R.drawable.apart_six).into(background)
 
         categories.layoutManager = GridLayoutManager(this, 2)
@@ -41,7 +46,7 @@ class ServiceChooser : AppCompatActivity() {
         val services = realm.where(OfferedService::class.java).findAll()
 
         if (services.isNotEmpty()) {
-            val adapter = ServiceChooserAdapter(this, services)
+            val adapter = ServiceChooserAdapter(this, services, name)
             categories.adapter = adapter
         }
     }

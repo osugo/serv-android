@@ -18,7 +18,8 @@ import io.realm.RealmResults
 /**
  * Created by kombo on 07/10/2017.
  */
-class ServiceChooserAdapter(private val context: Context, private val services: RealmResults<OfferedService>) : RecyclerView.Adapter<ServiceChooserAdapter.ViewHolder>() {
+class ServiceChooserAdapter(private val context: Context, private val services: RealmResults<OfferedService>, private val propertyName: String)
+    : RecyclerView.Adapter<ServiceChooserAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent?.context).inflate(R.layout.service_selection, parent, false)
@@ -26,14 +27,14 @@ class ServiceChooserAdapter(private val context: Context, private val services: 
     }
 
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
-        holder?.bindItems(context, services[holder.adapterPosition], holder.adapterPosition)
+        holder?.bindItems(context, services[holder.adapterPosition], propertyName)
     }
 
     override fun getItemCount(): Int = services.size
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        fun bindItems(context: Context, offeredService: OfferedService, position: Int) {
+        fun bindItems(context: Context, offeredService: OfferedService, propertyName: String) {
             val background = itemView.findViewById<RelativeLayout>(R.id.background)
             val service = itemView.findViewById<TextView>(R.id.service)
             val icon = itemView.findViewById<SquareImageView>(R.id.icon)
@@ -42,7 +43,7 @@ class ServiceChooserAdapter(private val context: Context, private val services: 
             Glide.with(context).load(offeredService.icon).centerCrop().into(icon)
 
             background.setOnClickListener {
-                context.startActivity(Intent(context, Details::class.java).putExtra(Details.SELECTED_SERVICE, position))
+                context.startActivity(Intent(context, Details::class.java).putExtra(Details.SELECTED_SERVICE, offeredService.title).putExtra(Details.PROPERTY, propertyName))
             }
         }
     }

@@ -6,6 +6,8 @@ import io.realm.RealmObject
  * Created by kombo on 24/08/2017.
  */
 open class Request(
-        private var service: OfferedService? = null,
-        private var description: String? = null,
-        private var time: String? = null) : RealmObject()
+        var service: OfferedService? = null,
+        var property: Property? = null,
+        var description: String? = null,
+        var date: String? = null,
+        var time: String? = null) : RealmObject()

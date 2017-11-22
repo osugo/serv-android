@@ -36,4 +36,13 @@
         <!--<item name="android:textViewStyle">@style/AppTheme.Widget.TextView</item>-->
     </style>
 
+    <style name="AlertDialogTheme" parent="Theme.AppCompat.Dialog.Alert">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/app_theme</item>
+        <item name="android:textColorPrimary">@color/textColorPrimary</item>
+        <item name="android:textColorSecondary">@color/textColorSecondary</item>
+        <item name="android:windowBackground">@color/colorBackground</item>
+    </style>
+
 </resources>

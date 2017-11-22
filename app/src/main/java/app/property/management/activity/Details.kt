@@ -1,30 +1,45 @@
 package app.property.management.activity
 
+import android.app.Dialog
+import android.content.Intent
 import android.os.Bundle
-import android.support.design.widget.TabLayout
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentManager
-import android.support.v4.app.FragmentPagerAdapter
+import android.support.v4.app.DialogFragment
+import android.support.v4.content.ContextCompat
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
+import android.widget.Toast
 import app.property.management.R
-import app.property.management.fragment.DetailsFragment
 import app.property.management.model.OfferedService
+import app.property.management.model.Property
+import app.property.management.model.Request
 import app.property.management.util.RealmUtil
-import com.bumptech.glide.Glide
+import com.wdullaer.materialdatetimepicker.date.DatePickerDialog
+import com.wdullaer.materialdatetimepicker.time.TimePickerDialog
+import io.reactivex.Completable
 import io.realm.Realm
+import io.realm.exceptions.RealmException
 import kotlinx.android.synthetic.main.details.*
+import kotlinx.android.synthetic.main.toolbar.*
+import org.jetbrains.anko.toast
+import java.util.*
 
 
 /**
  * Created by kombo on 07/10/2017.
  */
-class Details : AppCompatActivity() {
+class Details : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
 
     lateinit var realm: Realm
+    lateinit var service: OfferedService
+    lateinit var property: Property
+    lateinit var date: String
+    lateinit var time: String
 
     companion object {
         val TAG = Details::class.java.simpleName
         val SELECTED_SERVICE = "title"
+        val PROPERTY = "name"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,52 +52,101 @@ class Details : AppCompatActivity() {
         supportActionBar?.setHomeButtonEnabled(true)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        Glide.with(this).load(R.drawable.apart_six).into(header)
+        val request: String? = intent.getStringExtra(SELECTED_SERVICE)
+        val name: String? = intent.getStringExtra(PROPERTY)
 
-        setUpViewPager()
-        tabLayout.setupWithViewPager(viewPager)
-        viewPager.currentItem = intent.getIntExtra(SELECTED_SERVICE, 0)
+        service = realm.where(OfferedService::class.java).equalTo("title", request).findFirst()!!
+        property = realm.where(Property::class.java).equalTo("name", name).findFirst()!!
 
-        tabLayout.tabMode = TabLayout.MODE_SCROLLABLE
-        tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
-            override fun onTabReselected(tab: TabLayout.Tab?) {
-            }
+        toolbar.title = service.title
 
-            override fun onTabUnselected(tab: TabLayout.Tab?) {
-            }
-
-            override fun onTabSelected(tab: TabLayout.Tab) {
-                viewPager.setCurrentItem(tab.position, true)
-            }
+        schedule.setOnClickListener({
+            if (description.text.isNotEmpty())
+                showDatePickerDialog()
+            else
+                toast("Please enter a description to proceed")
         })
     }
 
-    private fun setUpViewPager() {
-        val viewPagerAdapter = ViewPagerAdapter(supportFragmentManager)
-
-        val services = realm.where(OfferedService::class.java).findAll()
-
-        if (services.isNotEmpty())
-            for (service in services)
-                viewPagerAdapter.add(DetailsFragment.newInstance(service.title), service.title)
-
-        viewPager.adapter = viewPagerAdapter
+    private fun showDatePickerDialog() {
+        val now = Calendar.getInstance()
+        val datePickerDialog = DatePickerDialog.newInstance(
+                this@Details,
+                now.get(Calendar.YEAR),
+                now.get(Calendar.MONTH),
+                now.get(Calendar.DAY_OF_MONTH)
+        )
+        datePickerDialog.isThemeDark = true //set dark them for dialog?
+        datePickerDialog.vibrate(true) //vibrate on choosing date?
+        datePickerDialog.dismissOnPause(true) //dismiss dialog when onPause() called?
+        datePickerDialog.showYearPickerFirst(false) //choose year first?
+        datePickerDialog.accentColor = ContextCompat.getColor(this, R.color.app_theme) // custom accent color
+        datePickerDialog.setTitle("Please select a date") //dialog title
+        datePickerDialog.show(fragmentManager, "DatePickerDialog")
     }
 
-    private class ViewPagerAdapter(manager: FragmentManager) : FragmentPagerAdapter(manager) {
-        private val fragmentList = ArrayList<Fragment>()
-        private val titles = ArrayList<String>()
+    override fun onDateSet(view: DatePickerDialog?, year: Int, monthOfYear: Int, dayOfMonth: Int) {
+        date = "$dayOfMonth/$monthOfYear/$year"
 
-        override fun getItem(position: Int): Fragment = fragmentList[position]
+        showTimePickerDialog()
+    }
 
-        override fun getCount(): Int = fragmentList.size
+    private fun showTimePickerDialog() {
+        val now = Calendar.getInstance()
+        val timePickerDialog = TimePickerDialog.newInstance(this@Details,
+                now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE), true)
+        timePickerDialog.isThemeDark = true //Dark Theme?
+        timePickerDialog.vibrate(false) //vibrate on choosing time?
+        timePickerDialog.dismissOnPause(false) //dismiss the dialog onPause() called?
+        timePickerDialog.enableSeconds(true) //show seconds?
 
-        fun add(fragment: Fragment, title: String?) {
-            fragmentList.add(fragment)
-            titles.add(title!!)
+        //Handling cancel event
+        timePickerDialog.setOnCancelListener({ Toast.makeText(this@Details, "Cancel choosing time", Toast.LENGTH_SHORT).show() })
+        timePickerDialog.show(fragmentManager, "TimePickerDialog") //show time picker dialog
+    }
+
+    override fun onTimeSet(view: TimePickerDialog?, hourOfDay: Int, minute: Int, second: Int) {
+        val hourString = if (hourOfDay < 10) "0" + hourOfDay else "" + hourOfDay
+        val minuteString = if (minute < 10) "0" + minute else "" + minute
+        val secondString = if (second < 10) "0" + second else "" + second
+
+        time = "$hourString:$minuteString:$secondString"
+
+        Completable.fromAction({
+            try {
+                realm.executeTransaction({
+                    val request = Request()
+                    request.service = service
+                    request.property = property
+                    request.description = description.text.toString()
+                    request.date = date
+                    request.time = time
+
+                    realm.copyToRealmOrUpdate(request)
+                })
+            } catch (ex: RealmException) {
+                Log.e(TAG, ex.localizedMessage, ex)
+            }
+        }).subscribe {
+            ConfirmationDialog().show(supportFragmentManager, "ConfirmationDialog")
         }
+    }
 
-        override fun getPageTitle(position: Int): CharSequence = titles[position]
+    class ConfirmationDialog : DialogFragment() {
+
+        override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+            return AlertDialog.Builder(activity, R.style.AlertDialogTheme)
+                    .setMessage("Request has been logged successfully. Would you like complete action or choose another service?")
+                    .setPositiveButton("Complete Action", { _, _ ->
+                        startActivity(Intent(activity, Summary::class.java))
+
+                        dismiss()
+                    }).setNegativeButton("Choose Other", { _, _ ->
+                activity.onBackPressed()
+
+                dismiss()
+            }).create()
+        }
     }
 
     override fun onDestroy() {

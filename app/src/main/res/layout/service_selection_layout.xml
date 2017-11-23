@@ -12,9 +12,9 @@
 
         <ImageView
             android:id="@+id/background"
-            android:scaleType="centerCrop"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop" />
 
         <View
             android:layout_width="match_parent"
@@ -28,11 +28,21 @@
             android:alpha="0.5"
             android:background="#1fa4c7" />
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/categories"
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="30dp"/>
+            android:layout_margin="25dp"
+            android:layout_gravity="center"
+            android:background="@drawable/property_background"
+            android:padding="15dp">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/categories"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
 
     </FrameLayout>
 

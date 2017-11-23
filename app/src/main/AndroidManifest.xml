@@ -35,6 +35,10 @@
             android:label="Property Details"
             android:launchMode="singleTop" />
         <activity
+            android:name=".activity.Properties"
+            android:label="My Properties"
+            android:launchMode="singleTop"/>
+        <activity
             android:name=".activity.Details"
             android:label="" />
         <activity
@@ -61,7 +65,6 @@
                 <data android:scheme="@string/fb_login_protocol_scheme" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.Properties" />
     </application>
 
 </manifest>

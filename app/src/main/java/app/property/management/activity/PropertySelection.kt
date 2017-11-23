@@ -167,16 +167,14 @@ class PropertySelection : AppCompatActivity(), View.OnClickListener, RadioGroup.
 
         if (nameOfProperty.isNotBlank() && locationOfProperty.isNotBlank() && !typeOfProperty.isNullOrBlank()) {
             try {
-                val user: User? = realm.where(User::class.java).findFirst()
-
                 realm.executeTransaction {
-                    val property = Property(user!!.id, nameOfProperty, locationOfProperty, typeOfProperty)
+                    val property = Property(nameOfProperty, locationOfProperty, typeOfProperty)
                     realm.copyToRealmOrUpdate(property)
                 }
             } catch (e: RealmException) {
                 Log.e(TAG, e.message, e)
             } finally {
-                startActivity(Intent(this, ServiceChooser::class.java).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))
+                startActivity(Intent(this, Properties::class.java).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))
                 finish()
             }
         }

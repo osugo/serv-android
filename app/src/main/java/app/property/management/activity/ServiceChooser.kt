@@ -3,12 +3,12 @@ package app.property.management.activity
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.LinearLayoutManager
 import app.property.management.R
 import app.property.management.adapter.ServiceChooserAdapter
 import app.property.management.model.OfferedService
 import app.property.management.model.Property
 import app.property.management.util.RealmUtil
+import app.property.management.view.DividerItemDecoration
 import com.bumptech.glide.Glide
 import io.realm.Realm
 import kotlinx.android.synthetic.main.service_selection_layout.*

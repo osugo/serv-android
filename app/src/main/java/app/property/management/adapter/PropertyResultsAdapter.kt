@@ -3,6 +3,7 @@ package app.property.management.adapter
 import android.content.Context
 import android.content.Intent
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -41,6 +42,8 @@ class PropertyResultsAdapter(private val context: Context, data: OrderedRealmCol
 
             name.text = property.name
             location.text = property.location
+
+            Log.e("PropertyType", property.propertyType)
 
             when (property.propertyType) {
                 context.getString(R.string.apartment) -> Glide.with(context).load(R.drawable.ic_apartments).into(icon)

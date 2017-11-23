@@ -9,4 +9,4 @@ import io.realm.annotations.PrimaryKey
 open class OfferedService(
         @PrimaryKey var title: String? = null,
         var image: String? = null,
-        var icon: Int?) : RealmObject()
+        var icon: Int? = null) : RealmObject()

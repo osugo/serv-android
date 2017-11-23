@@ -40,7 +40,7 @@ class ServiceChooserAdapter(private val context: Context, private val services: 
             val icon = itemView.findViewById<SquareImageView>(R.id.icon)
 
             service.text = offeredService.title
-            Glide.with(context).load(offeredService.icon).centerCrop().into(icon)
+            Glide.with(context).load(offeredService.icon).into(icon)
 
             background.setOnClickListener {
                 context.startActivity(Intent(context, Details::class.java).putExtra(Details.SELECTED_SERVICE, offeredService.title).putExtra(Details.PROPERTY, propertyName))

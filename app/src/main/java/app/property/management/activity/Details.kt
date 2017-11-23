@@ -37,7 +37,7 @@ class Details : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
     lateinit var time: String
 
     companion object {
-        val TAG = Details::class.java.simpleName
+        val TAG = Details::class.java.simpleName!!
         val SELECTED_SERVICE = "title"
         val PROPERTY = "name"
     }
@@ -58,7 +58,7 @@ class Details : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
         service = realm.where(OfferedService::class.java).equalTo("title", request).findFirst()!!
         property = realm.where(Property::class.java).equalTo("name", name).findFirst()!!
 
-        toolbar.title = service.title
+        supportActionBar?.title = service.title
 
         schedule.setOnClickListener({
             if (description.text.isNotEmpty())
@@ -116,6 +116,7 @@ class Details : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
             try {
                 realm.executeTransaction({
                     val request = Request()
+                    request.timestamp = System.currentTimeMillis()
                     request.service = service
                     request.property = property
                     request.description = description.text.toString()

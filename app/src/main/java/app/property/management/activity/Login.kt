@@ -101,8 +101,7 @@ class Login : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, V
         realm = Realm.getInstance(RealmUtil.getRealmConfig())
 
         if (realm.where(User::class.java).findAll().isNotEmpty()) { //user is already logged in, proceed to app
-            startActivity(Intent(this, PropertySelection::class.java).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP))
-            finish()
+            launchIntent()
         } else {
             val googleSignInOptions: GoogleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build()
             googleApiClient = GoogleApiClient.Builder(this).enableAutoManage(this, this).addApi(Auth.GOOGLE_SIGN_IN_API, googleSignInOptions).build()
@@ -115,7 +114,7 @@ class Login : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, V
         }
 
         background.setColorFilter(Color.parseColor("#50000000"), PorterDuff.Mode.ADD)
-        Glide.with(this).load(R.drawable.apart_one).centerCrop().error(android.R.color.darker_gray).into(background)
+        Glide.with(this).load(R.drawable.apart_one).into(background)
     }
 
     override fun onStart() {
@@ -257,12 +256,16 @@ class Login : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, V
                 Log.e(TAG, ex.message, ex)
             }
         }).subscribe({
-            if (realm.where(Property::class.java).findAll().isNotEmpty())
-                startActivity(Intent(this, Properties::class.java))
-            else
-                startActivity(Intent(this, PropertySelection::class.java).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP))
-
-            finish()
+           launchIntent()
         })
+    }
+
+    private fun launchIntent(){
+        if (realm.where(Property::class.java).findAll().isNotEmpty()) {
+            startActivity(Intent(this, Properties::class.java).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP))
+        } else
+            startActivity(Intent(this, PropertySelection::class.java).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP))
+
+        finish()
     }
 }

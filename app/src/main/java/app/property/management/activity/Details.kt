@@ -8,6 +8,7 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import android.view.MenuItem
 import android.widget.Toast
 import app.property.management.R
 import app.property.management.model.OfferedService
@@ -148,6 +149,14 @@ class Details : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
                 dismiss()
             }).create()
         }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean = when (item?.itemId) {
+        android.R.id.home -> {
+            onBackPressed();
+            true
+        }
+        else -> false
     }
 
     override fun onDestroy() {

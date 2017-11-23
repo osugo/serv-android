@@ -19,7 +19,7 @@ import kotlinx.android.synthetic.main.toolbar.*
 /**
  * Created by kombo on 22/11/2017.
  */
-class Properties: AppCompatActivity() {
+class Properties : AppCompatActivity() {
 
     lateinit var realm: Realm
 
@@ -46,11 +46,17 @@ class Properties: AppCompatActivity() {
         return true
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean = when (item?.itemId){
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean = when (item?.itemId) {
         R.id.add -> {
             startActivity(Intent(this, PropertySelection::class.java))
             true
         }
+        android.R.id.home -> {
+            onBackPressed()
+            true
+        }
         else -> false
     }
+
+
 }

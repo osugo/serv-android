@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity
 import android.text.Html
 import android.text.Spanned
 import android.util.Log
+import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
 import android.widget.RadioGroup
@@ -203,6 +204,14 @@ class PropertySelection : AppCompatActivity(), View.OnClickListener, RadioGroup.
 
         // TODO(Developer): Check error code and notify the user of error state and resolution.
         Toast.makeText(this, "Could not connect to Google API Client: Error " + connectionResult.errorCode, Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean = when (item?.itemId) {
+        android.R.id.home -> {
+            onBackPressed();
+            true
+        }
+        else -> false
     }
 
     override fun onDestroy() {

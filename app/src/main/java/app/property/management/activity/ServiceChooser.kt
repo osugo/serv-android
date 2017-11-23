@@ -3,6 +3,7 @@ package app.property.management.activity
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
+import android.view.MenuItem
 import app.property.management.R
 import app.property.management.adapter.ServiceChooserAdapter
 import app.property.management.model.OfferedService
@@ -49,5 +50,13 @@ class ServiceChooser : AppCompatActivity() {
             val adapter = ServiceChooserAdapter(this, services, name)
             categories.adapter = adapter
         }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean = when (item?.itemId) {
+        android.R.id.home -> {
+            onBackPressed();
+            true
+        }
+        else -> false
     }
 }

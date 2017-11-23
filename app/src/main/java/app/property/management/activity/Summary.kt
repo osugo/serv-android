@@ -1,8 +1,10 @@
 package app.property.management.activity
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
+import android.view.MenuItem
 import app.property.management.R
 import app.property.management.adapter.RequestsAdapter
 import app.property.management.model.Request
@@ -38,6 +40,14 @@ class Summary : AppCompatActivity() {
             val adapter = RequestsAdapter(this, requests)
             recycler.adapter = adapter
         }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean = when (item?.itemId) {
+        android.R.id.home -> {
+            startActivity(Intent(this, Properties::class.java).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP))
+            true
+        }
+        else -> false
     }
 
     override fun onDestroy() {

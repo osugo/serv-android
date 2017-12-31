@@ -10,6 +10,7 @@ import app.property.management.model.OfferedService
 import app.property.management.model.Property
 import app.property.management.util.RealmUtil
 import app.property.management.view.DividerItemDecoration
+import app.property.management.view.SpacesItemDecoration
 import com.bumptech.glide.Glide
 import io.realm.Realm
 import kotlinx.android.synthetic.main.service_selection_layout.*
@@ -40,9 +41,8 @@ class ServiceChooser : AppCompatActivity() {
 
         val name = intent.getStringExtra(PROPERTY_NAME)
 
-        Glide.with(this).load(R.drawable.apart_six).into(background)
-
         categories.layoutManager = GridLayoutManager(this, 2)
+        categories.addItemDecoration(SpacesItemDecoration(10))
 
         val services = realm.where(OfferedService::class.java).findAll()
 

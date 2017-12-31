@@ -3,6 +3,7 @@ package app.property.management
 import android.content.Context
 import android.support.multidex.MultiDexApplication
 import app.property.management.util.RealmUtil
+import com.crashlytics.android.Crashlytics
 import com.crashlytics.android.answers.Answers
 import com.facebook.FacebookSdk
 import com.facebook.appevents.AppEventsLogger
@@ -28,8 +29,8 @@ class House : MultiDexApplication() {
         Realm.init(this)
         Realm.setDefaultConfiguration(RealmUtil.getRealmConfig())
 
-//        Fabric.with(this, Crashlytics(), Answers())
-        Fabric.with(this, Answers())
+        Fabric.with(this, Crashlytics(), Answers())
+//        Fabric.with(this, Answers())
     }
 
     public fun getContext(): Context = INSTANCE

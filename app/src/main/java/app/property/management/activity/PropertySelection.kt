@@ -109,7 +109,7 @@ class PropertySelection : AppCompatActivity(), View.OnClickListener, RadioGroup.
             places.release()
             return@ResultCallback
         }
-        
+
         val place = places.get(0)
 
         location.setText(place.address)

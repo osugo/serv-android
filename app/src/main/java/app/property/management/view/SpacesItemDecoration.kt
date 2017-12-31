@@ -7,7 +7,7 @@ import android.view.View
 /**
  * Created by kombo on 04/12/2017.
  */
-class SpacesItemDecoration(private val spacesInPixels: Int): RecyclerView.ItemDecoration() {
+class SpacesItemDecoration(private val spacesInPixels: Int) : RecyclerView.ItemDecoration() {
 
     override fun getItemOffsets(outRect: Rect?, view: View?, parent: RecyclerView?, state: RecyclerView.State?) {
         outRect?.left = spacesInPixels;

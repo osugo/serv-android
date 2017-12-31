@@ -105,12 +105,11 @@ class PropertySelection : AppCompatActivity(), View.OnClickListener, RadioGroup.
      */
     private val updatePlaceDetailsCallback = ResultCallback<PlaceBuffer> { places ->
         if (!places.status.isSuccess) {
-            // Request did not complete successfully
             Log.e(TAG, "Place query did not complete. Error: " + places.status.toString())
             places.release()
             return@ResultCallback
         }
-        // Get the Place object from the buffer.
+        
         val place = places.get(0)
 
         location.setText(place.address)

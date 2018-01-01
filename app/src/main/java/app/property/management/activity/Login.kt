@@ -2,8 +2,11 @@ package app.property.management.activity
 
 import android.app.ProgressDialog
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.support.design.widget.Snackbar
+import android.support.v4.app.ActivityCompat
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.View
@@ -44,11 +47,15 @@ class Login : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, V
     private var realm: Realm by Delegates.notNull()
     private var googleApiClient: GoogleApiClient? = null
     private var progressDialog: ProgressDialog? = null
+
+    private var locationPermissionGranted: Boolean = false
+
     private lateinit var callbackManager: CallbackManager
 
     companion object {
         val TAG: String = "Login"
         val RC_SIGN_IN = 9001
+        val PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 123
     }
 
     override fun onClick(view: View?) {
@@ -120,6 +127,8 @@ class Login : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, V
 
         realm = Realm.getInstance(RealmUtil.getRealmConfig())
 
+        getLocationPermission()
+
         if (realm.where(User::class.java).findAll().isNotEmpty()) { //user is already logged in, proceed to app
             launchIntent()
         } else {
@@ -139,6 +148,41 @@ class Login : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, V
             register.setOnClickListener(this)
             signUpText.setOnClickListener(this)
             loginText.setOnClickListener(this)
+        }
+    }
+
+
+    /**
+     * Prompts the user for permission to use the device location.
+     */
+    private fun getLocationPermission() {
+        /*
+         * Request location permission, so that we can get the location of the
+         * device. The result of the permission request is handled by a callback,
+         * onRequestPermissionsResult.
+         */
+        if (ContextCompat.checkSelfPermission(this.applicationContext,
+                android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            locationPermissionGranted = true
+        } else {
+            ActivityCompat.requestPermissions(this,
+                    arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
+                    PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION)
+        }
+    }
+
+    /**
+     * Handles the result of the request for location permissions.
+     */
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        locationPermissionGranted = false
+        when (requestCode) {
+            PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION -> {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    locationPermissionGranted = true
+                }
+            }
         }
     }
 

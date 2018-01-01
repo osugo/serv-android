@@ -12,12 +12,20 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.AdapterView
 import android.widget.FrameLayout
 import android.widget.TextView
+import android.widget.Toast
 import app.property.management.R
+import app.property.management.activity.Login.Companion.PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION
+import app.property.management.adapter.PlaceAutocompleteAdapter
+import com.google.android.gms.common.ConnectionResult
+import com.google.android.gms.common.api.GoogleApiClient
+import com.google.android.gms.common.api.ResultCallback
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.places.GeoDataClient
+import com.google.android.gms.location.places.PlaceBuffer
 import com.google.android.gms.location.places.PlaceDetectionClient
 import com.google.android.gms.location.places.Places
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -25,11 +33,13 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import kotlinx.android.synthetic.main.property_selection.*
 import kotlinx.android.synthetic.main.toolbar.*
 
-class MapActivity : AppCompatActivity(), OnMapReadyCallback {
+class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener, AdapterView.OnItemClickListener {
 
     private lateinit var map: GoogleMap
 
@@ -57,17 +67,51 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private var mLikelyPlaceAttributions: Array<String>? = null
     private var mLikelyPlaceLatLngs: Array<LatLng>? = null
 
+    // Obtain a client for use with Places API
+    private lateinit var googleApiClient: GoogleApiClient
+    private lateinit var adapter: PlaceAutocompleteAdapter
+
     companion object {
-        val TAG = MapActivity::class.java.simpleName!!
+        val TAG: String = MapActivity::class.java.simpleName
         val SELECTED_SERVICE = "title"
         val PROPERTY = "name"
         // Keys for storing activity state.
         val KEY_CAMERA_POSITION = "camera_position"
         val KEY_LOCATION = "location"
+        val BOUNDS_GREATER_SYDNEY = LatLngBounds(LatLng(-34.041458, 150.790100), LatLng(-33.682247, 151.383362));
+    }
+
+    override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+        val item = adapter.getItem(position)
+        val placeId = item.placeId
+        val primaryText = item.getPrimaryText(null)
+
+        Log.i(PropertySelection.TAG, "Autocomplete item selected: " + primaryText)
+
+        /*
+             Issue a request to the Places Geo Data API to retrieve a Place object with additional
+             details about the place.
+              */
+        val placeResult = Places.GeoDataApi.getPlaceById(googleApiClient, placeId)
+        placeResult.setResultCallback(updatePlaceDetailsCallback)
+
+        Toast.makeText(applicationContext, "Clicked: " + primaryText, Toast.LENGTH_SHORT).show()
+        Log.i(PropertySelection.TAG, "Called getPlaceById to get Place details for " + placeId!!)
+    }
+
+    override fun onConnectionFailed(connectionResult: ConnectionResult) {
+        //do nothing, connection failed
+        Log.e(TAG, "onConnectionFailed: ConnectionResult.getErrorCode() = " + connectionResult.errorCode)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        googleApiClient = GoogleApiClient.Builder(this)
+                .enableAutoManage(this, 0 /* clientId */, this)
+                .addApi(Places.GEO_DATA_API)
+                .build()
+
         setContentView(R.layout.activity_properties)
 
         setSupportActionBar(toolbar)
@@ -86,6 +130,11 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
+        location.onItemClickListener = this
+
+        adapter = PlaceAutocompleteAdapter(this, googleApiClient, BOUNDS_GREATER_SYDNEY, null)
+        location.setAdapter(adapter)
     }
 
     /**
@@ -142,6 +191,42 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             outState.putParcelable(KEY_LOCATION, mLastKnownLocation)
             super.onSaveInstanceState(outState)
         }
+    }
+
+    /**
+     * Callback for results from a Places Geo Data API query that shows the first place result in
+     * the details view on screen.
+     */
+    private val updatePlaceDetailsCallback = ResultCallback<PlaceBuffer> { places ->
+        if (!places.status.isSuccess) {
+            Log.e(PropertySelection.TAG, "Place query did not complete. Error: " + places.status.toString())
+            places.release()
+            return@ResultCallback
+        }
+
+        val place = places.get(0)
+
+        location.setText(place.address)
+
+        Log.e(PropertySelection.TAG, place.address.toString())
+
+//        // Format details of the place for display and show it in a TextView.
+//        mPlaceDetailsText.setText(formatPlaceDetails(resources, place.name,
+//                place.id, place.address, place.phoneNumber,
+//                place.websiteUri))
+//
+//        // Display the third party attributions if set.
+//        val thirdPartyAttribution = places.attributions
+//        if (thirdPartyAttribution == null) {
+//            mPlaceDetailsAttribution.setVisibility(View.GONE)
+//        } else {
+//            mPlaceDetailsAttribution.setVisibility(View.VISIBLE)
+//            mPlaceDetailsAttribution.setText(Html.fromHtml(thirdPartyAttribution.toString()))
+//        }
+
+        Log.i(PropertySelection.TAG, "Place details received: " + place.name)
+
+        places.release()
     }
 
     /**

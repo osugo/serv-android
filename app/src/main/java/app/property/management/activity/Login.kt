@@ -151,7 +151,6 @@ class Login : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, V
         }
     }
 
-
     /**
      * Prompts the user for permission to use the device location.
      */

@@ -6,9 +6,9 @@
         <item name="windowActionModeOverlay">true</item>
         <item name="colorPrimary">@color/BrightOrange</item>
         <item name="colorPrimaryDark">#999</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorAccent">@color/BrightOrange</item>
         <!--<item name="android:statusBarColor">@android:color/transparent</item>-->
-        <item name="android:textColorPrimary">@android:color/primary_text_light</item>
+        <item name="android:textColorPrimary">#000t</item>
         <item name="android:textColorSecondary">@android:color/secondary_text_light</item>
         <item name="android:windowBackground">@android:color/white</item>
         <!--<item name="android:textViewStyle">@style/AppTheme.Widget.TextView</item>-->

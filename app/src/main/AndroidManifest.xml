@@ -75,7 +75,7 @@
             android:label="Pending Requests"
             android:launchMode="singleTop" />
         <activity
-            android:name=".activity.PropertiesActivity"
+            android:name=".activity.MapActivity"
             android:label="@string/title_activity_properties">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

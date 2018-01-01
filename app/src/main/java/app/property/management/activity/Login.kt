@@ -38,6 +38,7 @@ import java.security.MessageDigest
 import java.util.*
 import kotlin.properties.Delegates
 
+//TODO add code to request for location permission before user begins
 class Login : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
 
     private var realm: Realm by Delegates.notNull()
@@ -360,7 +361,7 @@ class Login : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, V
 
     private fun launchIntent() {
         if (realm.where(Property::class.java).findAll().isNotEmpty()) {
-            startActivity(Intent(this, Properties::class.java).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP))
+            startActivity(Intent(this, MapActivity::class.java).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP))
         } else
             startActivity(Intent(this, ServiceChooser::class.java).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP))
 

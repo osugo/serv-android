@@ -2,9 +2,8 @@ package app.property.management.activity
 
 import android.app.ProgressDialog
 import android.content.Intent
-import android.graphics.Color
-import android.graphics.PorterDuff
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.View
@@ -15,8 +14,10 @@ import app.property.management.model.OfferedService
 import app.property.management.model.Property
 import app.property.management.model.User
 import app.property.management.util.RealmUtil
-import com.bumptech.glide.Glide
-import com.facebook.*
+import com.facebook.CallbackManager
+import com.facebook.FacebookCallback
+import com.facebook.FacebookException
+import com.facebook.GraphRequest
 import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
 import com.google.android.gms.auth.api.Auth
@@ -26,12 +27,14 @@ import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.SignInButton
 import com.google.android.gms.common.api.GoogleApiClient
 import io.reactivex.Completable
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.realm.Realm
 import io.realm.RealmList
 import io.realm.exceptions.RealmException
 import kotlinx.android.synthetic.main.activity_login.*
+import kotlinx.android.synthetic.main.login.*
+import kotlinx.android.synthetic.main.register.*
 import org.jetbrains.anko.toast
+import java.security.MessageDigest
 import java.util.*
 import kotlin.properties.Delegates
 
@@ -49,8 +52,8 @@ class Login : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, V
 
     override fun onClick(view: View?) {
         when (view?.id) {
-            R.id.google -> signIn()
-            R.id.facebook -> {
+            R.id.google, R.id.googleLogin -> signIn()
+            R.id.facebook, R.id.facebookLogin -> {
                 LoginManager.getInstance().registerCallback(callbackManager, object : FacebookCallback<LoginResult> {
 
                     override fun onError(error: FacebookException?) {
@@ -85,6 +88,16 @@ class Login : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, V
 
                 LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile, email"))
             }
+            R.id.register -> registerUser(name.text.toString(), email.text.toString(), password.text.toString())
+            R.id.login -> loginUser(userEmail.text.toString(), userPassword.text.toString())
+            R.id.signUpText -> {
+                login_layout.visibility = View.GONE
+                registration_layout.visibility = View.VISIBLE
+            }
+            R.id.login_layout -> {
+                registration_layout.visibility = View.GONE
+                login_layout.visibility = View.VISIBLE
+            }
         }
     }
 
@@ -110,11 +123,14 @@ class Login : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, V
 
             google.setSize(SignInButton.SIZE_STANDARD)
             google.setOnClickListener(this)
+            googleLogin.setSize(SignInButton.SIZE_STANDARD)
+            googleLogin.setOnClickListener(this)
             facebook.setOnClickListener(this)
-        }
+            facebookLogin.setOnClickListener(this)
 
-        background.setColorFilter(Color.parseColor("#50000000"), PorterDuff.Mode.ADD)
-        Glide.with(this).load(R.drawable.apart_one).into(background)
+            signUpText.setOnClickListener(this)
+            loginText.setOnClickListener(this)
+        }
     }
 
     override fun onStart() {
@@ -193,15 +209,85 @@ class Login : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, V
             } catch (e: RealmException) {
                 Log.e(TAG, e.message, e)
             }
-        }.subscribeOn(AndroidSchedulers.mainThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
-                    addServices()
-                }, { throwable ->
-                    Toast.makeText(this, throwable.message, Toast.LENGTH_SHORT).show()
-                    Log.e(TAG, throwable.message, throwable)
+        }.subscribe({
+            addServices()
+        }, { throwable ->
+            Toast.makeText(this, throwable.message, Toast.LENGTH_SHORT).show()
+            Log.e(TAG, throwable.message, throwable)
+        }
+        )
+    }
+
+    private fun registerUser(username: String, useremail: String, userpass: String) {
+        if (isEmpty(username)) {
+            showSnackbarMessage("Please enter your name")
+            return
+        }
+
+        if (isEmpty(useremail)) {
+            showSnackbarMessage("Please provide your email address")
+            return
+        }
+
+        if (isEmpty(userpass)) {
+            showSnackbarMessage("Please create a password")
+            return
+        }
+
+        if (!isEmpty(username) && !isEmpty(useremail) && !isEmpty(userpass)) {
+            Completable.fromAction {
+                try {
+                    realm.executeTransaction { r ->
+
+                        // convert the name to a SHA-256 string and use it as the ID to ensure consistency and availability of an id
+                        val messageDigest = MessageDigest.getInstance("SHA-256")
+                        messageDigest.update(username.toByte())
+                        val id = String(messageDigest.digest())
+
+                        val user = User(id, username, useremail, null, userpass, null)
+                        r.copyToRealmOrUpdate(user)
+                    }
+                } catch (e: RealmException) {
+                    Log.e(TAG, e.message, e)
                 }
-                )
+            }.subscribe({
+                addServices()
+            }, { throwable ->
+                Toast.makeText(this, throwable.message, Toast.LENGTH_SHORT).show()
+                Log.e(TAG, throwable.message, throwable)
+            }
+            )
+        }
+    }
+
+    private fun loginUser(useremail: String, userpass: String) {
+        if (isEmpty(useremail)) {
+            showSnackbarMessage("Please provide your email address")
+            return
+        }
+
+        if (isEmpty(userpass)) {
+            showSnackbarMessage("Please create a password")
+            return
+        }
+
+        if (!isEmpty(useremail) && !isEmpty(userpass)) {
+            val results = realm.where(User::class.java).equalTo("email", useremail).equalTo("password", userpass).findAll()
+
+            if (results.isNotEmpty()) {
+                addServices()
+            } else {
+                showSnackbarMessage("Sorry, user does not exist. Please check credentials")
+            }
+        }
+    }
+
+    private fun isEmpty(text: String): Boolean {
+        return text.isNotBlank()
+    }
+
+    private fun showSnackbarMessage(message: String) {
+        Snackbar.make(parentLayout, message, Snackbar.LENGTH_SHORT).show()
     }
 
     private fun signIn() {
@@ -245,9 +331,9 @@ class Login : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, V
         services.add(OfferedService("Plumbing Services", null, R.drawable.plumbing))
         services.add(OfferedService("Fumigation Services", null, R.drawable.fumigator))
         services.add(OfferedService("AC Maintenance Services", null, R.drawable.air_conditioner))
-        services.add(OfferedService("Property Inspection Services", null, R.drawable.house_Inspection))
+        services.add(OfferedService("Property Inspection Services", null, R.drawable.house_inspection))
         services.add(OfferedService("Handyman Services", null, R.drawable.handyman))
-        services.add(OfferedService("Ground Maintenance Services", null, R.drawable.Landscaping))
+        services.add(OfferedService("Ground Maintenance Services", null, R.drawable.landscaping))
 
         Completable.fromAction({
             try {
@@ -256,15 +342,15 @@ class Login : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, V
                 Log.e(TAG, ex.message, ex)
             }
         }).subscribe({
-           launchIntent()
+            launchIntent()
         })
     }
 
-    private fun launchIntent(){
+    private fun launchIntent() {
         if (realm.where(Property::class.java).findAll().isNotEmpty()) {
             startActivity(Intent(this, Properties::class.java).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP))
         } else
-            startActivity(Intent(this, PropertySelection::class.java).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP))
+            startActivity(Intent(this, ServiceChooser::class.java).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP))
 
         finish()
     }

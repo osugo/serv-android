@@ -2,6 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/registration_layout"
+    android:visibility="gone"
     android:background="#fff">
 
     <LinearLayout
@@ -16,32 +18,37 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="20dp"
+            android:textColor="#000"
             android:text="Serv"
+            android:textStyle="bold"
             android:textSize="35sp" />
 
         <EditText
+            android:id="@+id/name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="7dp"
-            android:background="@drawable/edittext_bg" />
+            android:hint="Name"
+            android:background="@drawable/edittext_bg"
+            android:inputType="textPersonName" />
 
         <EditText
+            android:id="@+id/email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="7dp"
-            android:background="@drawable/edittext_bg" />
+            android:hint="Email"
+            android:background="@drawable/edittext_bg"
+            android:inputType="textEmailAddress" />
 
         <EditText
+            android:id="@+id/password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="7dp"
-            android:background="@drawable/edittext_bg" />
-
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="7dp"
-            android:background="@drawable/edittext_bg" />
+            android:hint="Password"
+            android:background="@drawable/edittext_bg"
+            android:inputType="textPassword" />
 
         <Button
             android:id="@+id/register"
@@ -79,15 +86,15 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:weightSum="2"
+            android:orientation="horizontal"
             android:padding="5dp"
-            android:orientation="horizontal">
+            android:weightSum="2">
 
             <Button
-                android:id="@+id/facebook"
+                android:id="@+id/facebookLogin"
                 android:layout_width="0dp"
-                android:layout_weight="1"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:background="@drawable/facebook_selector"
                 android:drawableStart="@drawable/fb_icon"
                 android:text="Sign In"
@@ -96,11 +103,11 @@
                 android:textStyle="bold" />
 
             <com.google.android.gms.common.SignInButton
-                android:id="@+id/google"
-                android:layout_height="wrap_content"
+                android:id="@+id/googleLogin"
                 android:layout_width="0dp"
-                android:layout_weight="1"
+                android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
+                android:layout_weight="1"
                 android:textAllCaps="true" />
 
         </LinearLayout>
@@ -108,14 +115,14 @@
     </LinearLayout>
 
     <TextView
+        android:id="@+id/loginText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
         android:layout_gravity="center_horizontal"
         android:layout_marginBottom="20dp"
-        android:id="@+id/signUpText"
-        android:text="Already have an account? Sign in"
-        android:layout_alignParentBottom="true"
         android:layout_marginTop="10dp"
-        android:layout_centerHorizontal="true" />
+        android:text="Already have an account? Sign in" />
 
 </RelativeLayout>

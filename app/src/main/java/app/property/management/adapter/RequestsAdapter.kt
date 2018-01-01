@@ -21,7 +21,7 @@ class RequestsAdapter(val context: Context, private val requests: RealmResults<R
     }
 
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
-        holder?.bindItems(context, requests[holder.adapterPosition], holder.adapterPosition)
+        holder?.bindItems(context, requests[holder.adapterPosition]!!, holder.adapterPosition)
     }
 
     override fun getItemCount(): Int = requests.size
@@ -29,10 +29,10 @@ class RequestsAdapter(val context: Context, private val requests: RealmResults<R
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         fun bindItems(context: Context, request: Request, pos: Int) {
-            val position = itemView.findViewById<TextView>(R.id.position) as TextView
-            val propertyName = itemView.findViewById<TextView>(R.id.propertyName) as TextView
-            val issue = itemView.findViewById<TextView>(R.id.issue) as TextView
-            val description = itemView.findViewById<TextView>(R.id.description) as TextView
+            val position = itemView.findViewById(R.id.position) as TextView
+            val propertyName = itemView.findViewById(R.id.propertyName) as TextView
+            val issue = itemView.findViewById(R.id.issue) as TextView
+            val description = itemView.findViewById(R.id.description) as TextView
 
             position.text = "${pos + 1}."
             propertyName.text = request.property?.name

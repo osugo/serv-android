@@ -6,6 +6,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import app.property.management.R
@@ -27,7 +28,7 @@ class ServiceChooserAdapter(private val context: Context, private val services: 
     }
 
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
-        holder?.bindItems(context, services[holder.adapterPosition], propertyName)
+        holder?.bindItems(context, services[holder.adapterPosition]!!, propertyName)
     }
 
     override fun getItemCount(): Int = services.size
@@ -35,9 +36,9 @@ class ServiceChooserAdapter(private val context: Context, private val services: 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         fun bindItems(context: Context, offeredService: OfferedService, propertyName: String) {
-            val background = itemView.findViewById<RelativeLayout>(R.id.background)
-            val service = itemView.findViewById<TextView>(R.id.service)
-            val icon = itemView.findViewById<SquareImageView>(R.id.icon)
+            val background = itemView.findViewById(R.id.background) as LinearLayout
+            val service = itemView.findViewById(R.id.service) as TextView
+            val icon = itemView.findViewById(R.id.icon) as SquareImageView
 
             service.text = offeredService.title
             Glide.with(context).load(offeredService.icon).into(icon)

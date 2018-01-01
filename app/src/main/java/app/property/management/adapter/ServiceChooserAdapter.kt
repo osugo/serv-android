@@ -11,6 +11,7 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import app.property.management.R
 import app.property.management.activity.Details
+import app.property.management.activity.PropertiesActivity
 import app.property.management.model.OfferedService
 import app.property.management.view.SquareImageView
 import com.bumptech.glide.Glide
@@ -19,7 +20,7 @@ import io.realm.RealmResults
 /**
  * Created by kombo on 07/10/2017.
  */
-class ServiceChooserAdapter(private val context: Context, private val services: RealmResults<OfferedService>, private val propertyName: String)
+class ServiceChooserAdapter(private val context: Context, private val services: RealmResults<OfferedService>, private val propertyName: String?)
     : RecyclerView.Adapter<ServiceChooserAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
@@ -35,7 +36,7 @@ class ServiceChooserAdapter(private val context: Context, private val services: 
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        fun bindItems(context: Context, offeredService: OfferedService, propertyName: String) {
+        fun bindItems(context: Context, offeredService: OfferedService, propertyName: String?) {
             val background = itemView.findViewById(R.id.background) as LinearLayout
             val service = itemView.findViewById(R.id.service) as TextView
             val icon = itemView.findViewById(R.id.icon) as SquareImageView
@@ -44,7 +45,7 @@ class ServiceChooserAdapter(private val context: Context, private val services: 
             Glide.with(context).load(offeredService.icon).into(icon)
 
             background.setOnClickListener {
-                context.startActivity(Intent(context, Details::class.java).putExtra(Details.SELECTED_SERVICE, offeredService.title).putExtra(Details.PROPERTY, propertyName))
+                context.startActivity(Intent(context, PropertiesActivity::class.java).putExtra(PropertiesActivity.SELECTED_SERVICE, offeredService.title))
             }
         }
     }

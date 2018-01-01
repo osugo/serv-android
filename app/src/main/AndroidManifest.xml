@@ -48,7 +48,7 @@
             android:label="" />
         <activity
             android:name=".activity.ServiceChooser"
-            android:label="Choose Service" />
+            android:label="Services" />
 
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"

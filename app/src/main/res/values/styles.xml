@@ -4,8 +4,8 @@
         <!-- Customize your theme here. -->
         <item name="windowActionBar">false</item>
         <item name="windowActionModeOverlay">true</item>
-        <item name="colorPrimary">@color/ProminentBlue</item>
-        <item name="colorPrimaryDark">@color/PurpBlue</item>
+        <item name="colorPrimary">@color/BrightOrange</item>
+        <item name="colorPrimaryDark">#999</item>
         <item name="colorAccent">@color/colorAccent</item>
         <!--<item name="android:statusBarColor">@android:color/transparent</item>-->
         <item name="android:textColorPrimary">@android:color/primary_text_light</item>

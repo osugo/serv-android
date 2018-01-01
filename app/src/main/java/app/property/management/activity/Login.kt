@@ -88,13 +88,19 @@ class Login : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, V
 
                 LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile, email"))
             }
-            R.id.register -> registerUser(name.text.toString(), email.text.toString(), password.text.toString())
-            R.id.login -> loginUser(userEmail.text.toString(), userPassword.text.toString())
+            R.id.register -> {
+                showProgressDialog()
+                registerUser(name.text.toString(), email.text.toString(), password.text.toString())
+            }
+            R.id.login -> {
+                showProgressDialog()
+                loginUser(userEmail.text.toString(), userPassword.text.toString())
+            }
             R.id.signUpText -> {
                 login_layout.visibility = View.GONE
                 registration_layout.visibility = View.VISIBLE
             }
-            R.id.login_layout -> {
+            R.id.loginText -> {
                 registration_layout.visibility = View.GONE
                 login_layout.visibility = View.VISIBLE
             }
@@ -128,6 +134,8 @@ class Login : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, V
             facebook.setOnClickListener(this)
             facebookLogin.setOnClickListener(this)
 
+            login.setOnClickListener(this)
+            register.setOnClickListener(this)
             signUpText.setOnClickListener(this)
             loginText.setOnClickListener(this)
         }
@@ -219,6 +227,8 @@ class Login : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, V
     }
 
     private fun registerUser(username: String, useremail: String, userpass: String) {
+        hideProgressDialog()
+
         if (isEmpty(username)) {
             showSnackbarMessage("Please enter your name")
             return
@@ -241,7 +251,7 @@ class Login : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, V
 
                         // convert the name to a SHA-256 string and use it as the ID to ensure consistency and availability of an id
                         val messageDigest = MessageDigest.getInstance("SHA-256")
-                        messageDigest.update(username.toByte())
+                        messageDigest.update(username.toByteArray())
                         val id = String(messageDigest.digest())
 
                         val user = User(id, username, useremail, null, userpass, null)
@@ -261,6 +271,8 @@ class Login : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, V
     }
 
     private fun loginUser(useremail: String, userpass: String) {
+        hideProgressDialog()
+
         if (isEmpty(useremail)) {
             showSnackbarMessage("Please provide your email address")
             return
@@ -283,7 +295,7 @@ class Login : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, V
     }
 
     private fun isEmpty(text: String): Boolean {
-        return text.isNotBlank()
+        return text.isBlank() or text.isEmpty()
     }
 
     private fun showSnackbarMessage(message: String) {

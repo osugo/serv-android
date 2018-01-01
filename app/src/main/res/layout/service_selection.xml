@@ -3,9 +3,9 @@
     android:id="@+id/background"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#fff"
+    android:background="#fffFFF"
     android:orientation="vertical"
-    android:padding="10dp">
+    android:padding="20dp">
 
     <app.property.management.view.SquareImageView
         android:id="@+id/icon"
@@ -19,10 +19,12 @@
         android:id="@+id/service"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
+        android:layout_gravity="center"
         android:layout_marginTop="10dp"
+        android:gravity="center"
         android:text="AC Services"
-        android:textAllCaps="true"
+        android:textColor="#000"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:textStyle="bold" />
 
 </LinearLayout>

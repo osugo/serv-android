@@ -15,6 +15,12 @@ class PropertiesActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var map: GoogleMap
 
+    companion object {
+        val TAG = PropertiesActivity::class.java.simpleName!!
+        val SELECTED_SERVICE = "title"
+        val PROPERTY = "name"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_properties)

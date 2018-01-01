@@ -9,9 +9,7 @@ import app.property.management.adapter.ServiceChooserAdapter
 import app.property.management.model.OfferedService
 import app.property.management.model.Property
 import app.property.management.util.RealmUtil
-import app.property.management.view.DividerItemDecoration
-import app.property.management.view.SpacesItemDecoration
-import com.bumptech.glide.Glide
+import app.property.management.view.GridItemDecoration
 import io.realm.Realm
 import kotlinx.android.synthetic.main.service_selection_layout.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -42,7 +40,7 @@ class ServiceChooser : AppCompatActivity() {
         val name = intent.getStringExtra(PROPERTY_NAME)
 
         categories.layoutManager = GridLayoutManager(this, 2)
-        categories.addItemDecoration(SpacesItemDecoration(10))
+        categories.addItemDecoration(GridItemDecoration(2, 5, false))
 
         val services = realm.where(OfferedService::class.java).findAll()
 
@@ -54,7 +52,7 @@ class ServiceChooser : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean = when (item?.itemId) {
         android.R.id.home -> {
-            onBackPressed();
+            onBackPressed()
             true
         }
         else -> false

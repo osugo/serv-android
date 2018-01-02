@@ -58,6 +58,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
     // The geographical location where the device is currently located. That is, the last-known
     // location retrieved by the Fused Location Provider.
     private var mLastKnownLocation: Location? = null
+    private var marker: Marker? = null
 
     // Used for selecting the current place.
     private val M_MAX_ENTRIES = 5
@@ -170,6 +171,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
                 return infoWindow
             }
         })
+
+        map.setOnMapLongClickListener { latLng -> showMarker(latLng!!, latLng.latitude.toString() + ", " + latLng.longitude.toString(), "") }
 
         // Prompt the user for permission.
         getLocationPermission()
@@ -373,7 +376,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
             Log.i(TAG, "The user did not grant location permission.")
 
             // Add a default marker, because the user hasn't selected a place.
-            map.addMarker(MarkerOptions()
+            marker = map.addMarker(MarkerOptions()
                     .title("Default Location")
                     .position(mDefaultLocation)
                     .snippet("No location found because location permission is disabled"))
@@ -396,7 +399,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
 
             // Add a marker for the selected place, with an info window
             // showing information about that place.
-            map.addMarker(MarkerOptions()
+            marker = map.addMarker(MarkerOptions()
                     .title(mLikelyPlaceNames!![which])
                     .position(markerLatLng)
                     .snippet(markerSnippet))
@@ -415,10 +418,10 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
     /**
      * Displays a marker on location selected from search results
      */
-    private fun showMarker(latLng: LatLng, title: String, address: String){
+    private fun showMarker(latLng: LatLng, title: String, address: String) {
         // Add a marker for the selected place, with an info window
         // showing information about that place.
-        map.addMarker(MarkerOptions()
+        marker = map.addMarker(MarkerOptions()
                 .title(title)
                 .position(latLng)
                 .snippet(address))

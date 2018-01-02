@@ -4,6 +4,7 @@ import android.content.DialogInterface
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
+import android.os.Handler
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
@@ -18,6 +19,7 @@ import android.widget.TextView
 import android.widget.Toast
 import app.property.management.R
 import app.property.management.adapter.PlaceAutocompleteAdapter
+import app.property.management.model.Property
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.common.api.ResultCallback
@@ -70,6 +72,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
     // Obtain a client for use with Places API
     private lateinit var googleApiClient: GoogleApiClient
     private lateinit var adapter: PlaceAutocompleteAdapter
+
+    private var property: Property? = null
 
     companion object {
         val TAG: String = MapActivity::class.java.simpleName
@@ -127,14 +131,17 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
         // Construct a FusedLocationProviderClient.
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
 
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
-        mapFragment.getMapAsync(this)
-
         location.onItemClickListener = this
 
         adapter = PlaceAutocompleteAdapter(this, googleApiClient, BOUNDS_GREATER_SYDNEY, null)
         location.setAdapter(adapter)
+
+        //add a 500ms delay to prevent the activity from freezing up before the map loads
+        Handler().postDelayed({
+            // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+            val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
+            mapFragment.getMapAsync(this)
+        }, 500)
     }
 
     /**

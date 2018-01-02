@@ -9,7 +9,7 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import app.property.management.R
-import app.property.management.activity.MapActivity
+import app.property.management.activity.Details
 import app.property.management.model.OfferedService
 import app.property.management.view.SquareImageView
 import com.bumptech.glide.Glide
@@ -40,11 +40,11 @@ class ServiceChooserAdapter(private val context: Context, private val services: 
             val icon = itemView.findViewById(R.id.icon) as SquareImageView
 
             service.text = offeredService.title
-//            icon.setImageResource(offeredService.icon!!)
             Glide.with(context).load(offeredService.icon).into(icon)
 
             background.setOnClickListener {
-                context.startActivity(Intent(context, MapActivity::class.java).putExtra(MapActivity.SELECTED_SERVICE, offeredService.title))
+//                context.startActivity(Intent(context, MapActivity::class.java).putExtra(MapActivity.SELECTED_SERVICE, offeredService.title))
+                context.startActivity(Intent(context, Details::class.java))
             }
         }
     }

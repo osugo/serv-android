@@ -17,7 +17,6 @@ import android.widget.FrameLayout
 import android.widget.TextView
 import android.widget.Toast
 import app.property.management.R
-import app.property.management.activity.Login.Companion.PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION
 import app.property.management.adapter.PlaceAutocompleteAdapter
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
@@ -186,7 +185,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
      * Saves the state of the map when the activity is paused.
      */
     override fun onSaveInstanceState(outState: Bundle?) {
-        if(map != null) {
+        if (map != null) {
             outState!!.putParcelable(KEY_CAMERA_POSITION, map.cameraPosition)
             outState.putParcelable(KEY_LOCATION, mLastKnownLocation)
             super.onSaveInstanceState(outState)
@@ -206,9 +205,11 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
 
         val place = places.get(0)
 
-        location.setText(place.address)
+        location.setText(place.name)
 
         Log.e(PropertySelection.TAG, place.address.toString())
+
+        showMarker(place.latLng, place.name.toString(), place.address.toString())
 
 //        // Format details of the place for display and show it in a TextView.
 //        mPlaceDetailsText.setText(formatPlaceDetails(resources, place.name,
@@ -302,7 +303,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        return when(item?.itemId){
+        return when (item?.itemId) {
             R.id.pick_place -> {
                 showCurrentPlace()
                 true
@@ -337,10 +338,10 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
                     }
 
                     var i = 0
-                    mLikelyPlaceNames = Array(count, {""})
-                    mLikelyPlaceAddresses =Array(count, {""})
-                    mLikelyPlaceAttributions = Array(count, {""})
-                    mLikelyPlaceLatLngs = Array(count, {LatLng(-33.8523341, 151.2106085)})
+                    mLikelyPlaceNames = Array(count, { "" })
+                    mLikelyPlaceAddresses = Array(count, { "" })
+                    mLikelyPlaceAttributions = Array(count, { "" })
+                    mLikelyPlaceLatLngs = Array(count, { LatLng(-33.8523341, 151.2106085) })
 
                     for (placeLikelihood in likelyPlaces) {
                         // Build a list of likely places to show the user.
@@ -387,31 +388,43 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
      */
     private fun openPlacesDialog() {
         // Ask the user to choose the place where they are now.
-        val listener = DialogInterface.OnClickListener { dialog, which ->
+        val listener = DialogInterface.OnClickListener { _, which ->
             // The "which" argument contains the position of the selected item.
             val markerLatLng = mLikelyPlaceLatLngs!![which]
             var markerSnippet = mLikelyPlaceAddresses!![which]
-            if (mLikelyPlaceAttributions!![which] != null) {
-                markerSnippet = markerSnippet + "\n" + mLikelyPlaceAttributions!![which]
-            }
+            markerSnippet = markerSnippet + "\n" + mLikelyPlaceAttributions!![which]
 
             // Add a marker for the selected place, with an info window
             // showing information about that place.
             map.addMarker(MarkerOptions()
                     .title(mLikelyPlaceNames!![which])
-                    .position(markerLatLng!!)
+                    .position(markerLatLng)
                     .snippet(markerSnippet))
 
             // Position the map's camera at the location of the marker.
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(markerLatLng,
-                    DEFAULT_ZOOM.toFloat()))
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(markerLatLng, DEFAULT_ZOOM.toFloat()))
         }
 
         // Display the dialog.
-        val dialog = AlertDialog.Builder(this)
+        AlertDialog.Builder(this)
                 .setTitle("Pick a place")
                 .setItems(mLikelyPlaceNames, listener)
                 .show()
+    }
+
+    /**
+     * Displays a marker on location selected from search results
+     */
+    private fun showMarker(latLng: LatLng, title: String, address: String){
+        // Add a marker for the selected place, with an info window
+        // showing information about that place.
+        map.addMarker(MarkerOptions()
+                .title(title)
+                .position(latLng)
+                .snippet(address))
+
+        // Position the map's camera at the location of the marker.
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, DEFAULT_ZOOM.toFloat()))
     }
 
     /**

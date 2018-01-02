@@ -8,7 +8,7 @@
         <item name="colorPrimaryDark">#999</item>
         <item name="colorAccent">@color/BrightOrange</item>
         <!--<item name="android:statusBarColor">@android:color/transparent</item>-->
-        <item name="android:textColorPrimary">#000t</item>
+        <item name="android:textColorPrimary">#000</item>
         <item name="android:textColorSecondary">@android:color/secondary_text_light</item>
         <item name="android:windowBackground">@android:color/white</item>
         <!--<item name="android:textViewStyle">@style/AppTheme.Widget.TextView</item>-->

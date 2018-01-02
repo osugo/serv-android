@@ -40,6 +40,7 @@ class ServiceChooserAdapter(private val context: Context, private val services: 
             val icon = itemView.findViewById(R.id.icon) as SquareImageView
 
             service.text = offeredService.title
+//            icon.setImageResource(offeredService.icon!!)
             Glide.with(context).load(offeredService.icon).into(icon)
 
             background.setOnClickListener {

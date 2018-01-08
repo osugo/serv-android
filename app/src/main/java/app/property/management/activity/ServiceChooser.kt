@@ -45,7 +45,7 @@ class ServiceChooser : AppCompatActivity() {
         val services = realm.where(OfferedService::class.java).findAll()
 
         if (services.isNotEmpty()) {
-            val adapter = ServiceChooserAdapter(this, services, name)
+            val adapter = ServiceChooserAdapter(this, services, name, realm)
             categories.adapter = adapter
         }
     }
@@ -56,5 +56,10 @@ class ServiceChooser : AppCompatActivity() {
             true
         }
         else -> false
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        realm.close()
     }
 }

@@ -403,10 +403,7 @@ class Login : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, V
     }
 
     private fun launchIntent() {
-        if (realm.where(Property::class.java).findAll().isNotEmpty()) {
-            startActivity(Intent(this, MapActivity::class.java).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP))
-        } else
-            startActivity(Intent(this, ServiceChooser::class.java).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP))
+        startActivity(Intent(this, ServiceChooser::class.java).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP))
 
         finish()
     }

@@ -29,8 +29,8 @@ class House : MultiDexApplication() {
         Realm.init(this)
         Realm.setDefaultConfiguration(RealmUtil.getRealmConfig())
 
-        Fabric.with(this, Crashlytics(), Answers())
-//        Fabric.with(this, Answers())
+//        Fabric.with(this, Crashlytics(), Answers())
+        Fabric.with(this, Answers())
     }
 
     public fun getContext(): Context = INSTANCE

@@ -52,6 +52,7 @@ dependencies {
     implementation 'com.google.android.gms:play-services-location:11.8.0'
     implementation 'com.google.android.gms:play-services-places:11.8.0'
     implementation "org.jetbrains.anko:anko:0.10.3"
+    implementation "org.jetbrains.anko:anko-design:0.10.3" // For SnackBars
     implementation 'com.facebook.android:facebook-android-sdk:4.19.0'
 //    compile 'com.facebook.fresco:fresco:1.5.0'
     implementation 'io.reactivex.rxjava2:rxkotlin:2.1.0'

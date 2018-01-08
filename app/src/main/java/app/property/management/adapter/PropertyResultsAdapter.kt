@@ -10,7 +10,9 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
+import app.property.management.Constants
 import app.property.management.R
+import app.property.management.activity.Details
 import app.property.management.activity.ServiceChooser
 import app.property.management.model.Property
 import com.bumptech.glide.Glide
@@ -20,11 +22,11 @@ import io.realm.RealmRecyclerViewAdapter
 /**
  * Created by kombo on 22/11/2017.
  */
-class PropertyResultsAdapter(private val context: Context, data: OrderedRealmCollection<Property>?, autoUpdate: Boolean, updateOnModification: Boolean) :
+class PropertyResultsAdapter(private val context: Context, private val service: String, data: OrderedRealmCollection<Property>?, autoUpdate: Boolean, updateOnModification: Boolean) :
         RealmRecyclerViewAdapter<Property, PropertyResultsAdapter.ViewHolder>(data, autoUpdate, updateOnModification) {
 
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
-        holder?.bindItems(data!![holder.adapterPosition], context)
+        holder?.bindItems(data!![holder.adapterPosition], context, service)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
@@ -34,16 +36,14 @@ class PropertyResultsAdapter(private val context: Context, data: OrderedRealmCol
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        fun bindItems(property: Property, context: Context) {
-            val name = itemView.findViewById<TextView>(R.id.name) as TextView
-            val location = itemView.findViewById<TextView>(R.id.location) as TextView
-            val icon = itemView.findViewById<ImageView>(R.id.icon) as ImageView
-            val layout = itemView.findViewById<RelativeLayout>(R.id.layout) as RelativeLayout
+        fun bindItems(property: Property, context: Context, service: String) {
+            val name = itemView.findViewById(R.id.name) as TextView
+            val location = itemView.findViewById(R.id.location) as TextView
+            val icon = itemView.findViewById(R.id.icon) as ImageView
+            val layout = itemView.findViewById(R.id.layout) as RelativeLayout
 
             name.text = property.name
             location.text = property.location
-
-            Log.e("PropertyType", property.propertyType)
 
             when (property.propertyType) {
                 context.getString(R.string.apartment) -> Glide.with(context).load(R.drawable.ic_apartments).into(icon)
@@ -52,7 +52,7 @@ class PropertyResultsAdapter(private val context: Context, data: OrderedRealmCol
             }
 
             layout.setOnClickListener {
-                context.startActivity(Intent(context, ServiceChooser::class.java).putExtra(ServiceChooser.PROPERTY_NAME, property.name))
+                context.startActivity(Intent(context, Details::class.java).putExtra(Constants.PROPERTY, property.name).putExtra(Constants.SERVICE, service))
             }
         }
     }

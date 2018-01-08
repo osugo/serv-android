@@ -1,6 +1,7 @@
 package app.property.management.activity
 
 import android.content.DialogInterface
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
@@ -17,9 +18,12 @@ import android.widget.AdapterView
 import android.widget.FrameLayout
 import android.widget.TextView
 import android.widget.Toast
+import app.property.management.Constants
 import app.property.management.R
 import app.property.management.adapter.PlaceAutocompleteAdapter
+import app.property.management.model.OfferedService
 import app.property.management.model.Property
+import app.property.management.util.RealmUtil
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.common.api.ResultCallback
@@ -37,11 +41,17 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import io.reactivex.Completable
+import io.realm.Realm
+import io.realm.exceptions.RealmException
 import kotlinx.android.synthetic.main.property_selection.*
 import kotlinx.android.synthetic.main.toolbar.*
+import org.jetbrains.anko.selector
 
 class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener, AdapterView.OnItemClickListener {
 
+
+    private lateinit var realm: Realm
     private lateinit var map: GoogleMap
 
     private lateinit var mGeoDataClient: GeoDataClient
@@ -75,10 +85,13 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
 
     private var property: Property? = null
 
+    private var name: String? = null
+    private var propertyLocation: String? = null
+    private var propertyType: String? = null
+    private var service: String? = null
+
     companion object {
         val TAG: String = MapActivity::class.java.simpleName
-        val SELECTED_SERVICE = "title"
-        val PROPERTY = "name"
         // Keys for storing activity state.
         val KEY_CAMERA_POSITION = "camera_position"
         val KEY_LOCATION = "location"
@@ -117,6 +130,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
                 .build()
 
         setContentView(R.layout.activity_properties)
+
+        realm = Realm.getInstance(RealmUtil.getRealmConfig())
+        service = intent.getStringExtra(Constants.SERVICE)
 
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -318,7 +334,38 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
                 showCurrentPlace()
                 true
             }
+            R.id.done -> {
+                showPropertyTypes()
+                true
+            }
             else -> false
+        }
+    }
+
+    /**
+     * Show the list of property types to select from
+     */
+    private fun showPropertyTypes() {
+        val types = listOf("Apartment", "Estate", "Commercial")
+        selector("Property Type", types, { _, i ->
+            propertyType = types[i]
+            createProperty()
+            Log.e(TAG, "Property type: $propertyType")
+        })
+    }
+
+    private fun createProperty() {
+        Completable.fromAction({
+            try {
+                realm.executeTransaction {
+                    val property = Property(name, propertyLocation, propertyType)
+                    realm.copyToRealmOrUpdate(property)
+                }
+            } catch (ex: RealmException) {
+                Log.e(TAG, ex.localizedMessage, ex)
+            }
+        }).subscribe {
+            startActivity(Intent(this, Details::class.java).putExtra(Constants.PROPERTY, name).putExtra(Constants.SERVICE, service))
         }
     }
 
@@ -435,6 +482,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
 
         // Position the map's camera at the location of the marker.
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, DEFAULT_ZOOM.toFloat()))
+
+        name = title
+        propertyLocation = address
     }
 
     /**
@@ -457,5 +507,10 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
         } catch (e: SecurityException) {
             Log.e("Exception: %s", e.message)
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        realm.close()
     }
 }

@@ -8,17 +8,22 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
+import app.property.management.Constants
 import app.property.management.R
 import app.property.management.activity.Details
+import app.property.management.activity.MapActivity
+import app.property.management.activity.Properties
 import app.property.management.model.OfferedService
+import app.property.management.model.Property
 import app.property.management.view.SquareImageView
 import com.bumptech.glide.Glide
+import io.realm.Realm
 import io.realm.RealmResults
 
 /**
  * Created by kombo on 07/10/2017.
  */
-class ServiceChooserAdapter(private val context: Context, private val services: RealmResults<OfferedService>, private val propertyName: String?)
+class ServiceChooserAdapter(private val context: Context, private val services: RealmResults<OfferedService>, private val propertyName: String?, private val realm: Realm)
     : RecyclerView.Adapter<ServiceChooserAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
@@ -27,14 +32,14 @@ class ServiceChooserAdapter(private val context: Context, private val services: 
     }
 
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
-        holder?.bindItems(context, services[holder.adapterPosition]!!, propertyName)
+        holder?.bindItems(context, services[holder.adapterPosition]!!, propertyName, realm)
     }
 
     override fun getItemCount(): Int = services.size
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        fun bindItems(context: Context, offeredService: OfferedService, propertyName: String?) {
+        fun bindItems(context: Context, offeredService: OfferedService, propertyName: String?, realm: Realm) {
             val background = itemView.findViewById(R.id.background) as LinearLayout
             val service = itemView.findViewById(R.id.service) as TextView
             val icon = itemView.findViewById(R.id.icon) as SquareImageView
@@ -44,8 +49,11 @@ class ServiceChooserAdapter(private val context: Context, private val services: 
             Glide.with(context).load(offeredService.icon).into(icon)
 
             background.setOnClickListener {
-//                context.startActivity(Intent(context, MapActivity::class.java).putExtra(MapActivity.SELECTED_SERVICE, offeredService.title))
-                context.startActivity(Intent(context, Details::class.java))
+                //                context.startActivity(Intent(context, MapActivity::class.java).putExtra(MapActivity.SELECTED_SERVICE, offeredService.title))
+                if (realm.where(Property::class.java).findAll().isNotEmpty())
+                    context.startActivity(Intent(context, Properties::class.java).putExtra(Constants.SERVICE, offeredService.title))
+                else
+                    context.startActivity(Intent(context, MapActivity::class.java).putExtra(Constants.SERVICE, offeredService.title))
             }
         }
     }

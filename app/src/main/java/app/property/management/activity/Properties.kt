@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.view.Menu
 import android.view.MenuItem
+import app.property.management.Constants
 import app.property.management.R
 import app.property.management.adapter.PropertyResultsAdapter
 import app.property.management.model.Property
@@ -36,8 +37,10 @@ class Properties : AppCompatActivity() {
         propertiesRecycler.layoutManager = LinearLayoutManager(this)
         propertiesRecycler.addItemDecoration(DividerItemDecoration(this))
 
+        val service = intent.getStringExtra(Constants.SERVICE)
+
         val results: RealmResults<Property> = realm.where(Property::class.java).findAll()
-        val adapter = PropertyResultsAdapter(this, results, true, true)
+        val adapter = PropertyResultsAdapter(this, service, results, true, true)
         propertiesRecycler.adapter = adapter
     }
 
@@ -48,7 +51,7 @@ class Properties : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean = when (item?.itemId) {
         R.id.add -> {
-            startActivity(Intent(this, PropertySelection::class.java))
+            startActivity(Intent(this, MapActivity::class.java))
             true
         }
         android.R.id.home -> {

@@ -5,14 +5,16 @@
     android:layout_height="wrap_content"
     android:background="#fffFFF"
     android:orientation="vertical"
-    android:padding="20dp">
+    android:padding="10dp">
 
     <app.property.management.view.SquareImageView
         android:id="@+id/icon"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="10dp"
         android:layout_gravity="center_horizontal"
+        android:layout_marginEnd="20dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="5dp"
         android:scaleType="centerCrop"
         android:src="@drawable/air_conditioner" />
 
@@ -21,11 +23,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="5dp"
         android:gravity="center"
         android:text="AC Services"
-        android:textColor="#000"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        android:textStyle="bold" />
+        android:textColor="#000" />
 
 </LinearLayout>

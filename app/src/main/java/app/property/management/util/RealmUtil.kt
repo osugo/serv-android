@@ -10,7 +10,7 @@ object RealmUtil {
     fun getRealmConfig(): RealmConfiguration {
         return RealmConfiguration.Builder()
                 .name("House")
-                .schemaVersion(1)
+                .schemaVersion(2)
                 .deleteRealmIfMigrationNeeded()
                 .build()
     }

@@ -382,14 +382,14 @@ class Login : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, V
 
     private fun addServices() {
         val services: RealmList<OfferedService> = RealmList()
-        services.add(OfferedService("Electrical Services", null, R.drawable.light_bulb))
-        services.add(OfferedService("Lift Services", null, R.drawable.elevator))
-        services.add(OfferedService("Plumbing Services", null, R.drawable.plumbing))
-        services.add(OfferedService("Fumigation Services", null, R.drawable.fumigator))
-        services.add(OfferedService("AC Maintenance Services", null, R.drawable.air_conditioner))
-        services.add(OfferedService("Property Inspection Services", null, R.drawable.house_inspection))
+        services.add(OfferedService("Electrical", null, R.drawable.light_bulb))
+        services.add(OfferedService("Lift Maintenance", null, R.drawable.elevator))
+        services.add(OfferedService("Plumbing", null, R.drawable.plumbing))
+        services.add(OfferedService("Fumigation", null, R.drawable.fumigator))
+        services.add(OfferedService("AC Maintenance", null, R.drawable.air_conditioner))
+        services.add(OfferedService("Property Inspection", null, R.drawable.house_inspection))
         services.add(OfferedService("Handyman Services", null, R.drawable.handyman))
-        services.add(OfferedService("Ground Maintenance Services", null, R.drawable.landscaping))
+        services.add(OfferedService("Ground Maintenance", null, R.drawable.landscaping))
 
         Completable.fromAction({
             try {

@@ -3,7 +3,6 @@ package app.property.management.activity
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
-import android.support.v4.content.ContextCompat.startActivity
 import android.support.v7.app.AppCompatActivity
 import android.view.WindowManager
 import app.property.management.R
@@ -30,7 +29,7 @@ class Splash: AppCompatActivity() {
 
         Glide.with(this).load(R.drawable.splash_image).into(background)
 
-        Handler().postDelayed({initialize()}, 500)
+        Handler().postDelayed({initialize()}, 3000)
     }
 
     private fun initialize() {

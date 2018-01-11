@@ -26,15 +26,18 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyDseWgMUQqZCmiLqBYCL0PUW97ka4-Uvd8" />
 
-        <activity
-            android:name=".activity.Login"
-            android:launchMode="singleTop">
+        <activity android:name=".activity.Splash"
+            android:launchMode="singleTask"
+            android:noHistory="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".activity.Login"
+            android:launchMode="singleTop"/>
         <activity
             android:name=".activity.PropertySelection"
             android:label="Property Details"

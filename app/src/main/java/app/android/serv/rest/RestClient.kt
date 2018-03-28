@@ -1,10 +1,9 @@
 package app.android.serv.rest
 
-import app.android.serv.rest.RxErrorHandlingCallAdapterFactory
+import app.android.serv.util.Commons
 import com.google.gson.ExclusionStrategy
 import com.google.gson.FieldAttributes
 import com.google.gson.GsonBuilder
-import com.mobile.wanda.promoter.Wanda
 import io.realm.RealmObject
 import okhttp3.Dispatcher
 import okhttp3.OkHttpClient
@@ -18,7 +17,7 @@ import java.util.concurrent.TimeUnit
  */
 object RestClient {
 
-    private val baseURL = "http://35.176.127.140/wanda-mobile/api/mobile/v1/"
+    private const val baseURL = "http://mtandao.space:5000/"
 
     private lateinit var retrofit: Retrofit
     private val tokenAuthenticator = TokenAuthenticator()
@@ -49,7 +48,7 @@ object RestClient {
                         val original = chain.request()
 
                         val request = original.newBuilder()
-                                .addHeader("Authorization", "Bearer " + Wanda.INSTANCE.getCredentials().accessToken)
+                                .addHeader("Authorization", "Bearer " + Commons.user!!.accessToken)
                                 .addHeader("Content-Type", "application/json")
                                 .build()
 

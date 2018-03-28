@@ -2,7 +2,8 @@ package app.android.serv.rest
 
 import android.util.Log
 import app.android.serv.R
-import app.android.serv.rest.RetrofitException
+import app.android.serv.Serv
+import app.android.serv.event.ErrorEvent
 import org.greenrobot.eventbus.EventBus
 
 /**
@@ -119,7 +120,7 @@ object ErrorHandler {
     }
 
     private fun accessStringResource(resourceName: Int): String {
-        return Wanda.INSTANCE.resources.getString(resourceName)
+        return Serv.INSTANCE.resources.getString(resourceName)
     }
 
     /**

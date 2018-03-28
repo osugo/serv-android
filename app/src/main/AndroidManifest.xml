@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="app.property.management">
+    package="app.android.serv">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -12,7 +12,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
-        android:name=".House"
+        android:name="app.android.serv.House"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -24,9 +24,9 @@
             android:value="069fc5277125b94ad2d9806c7015774e75bfec79" />
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyDseWgMUQqZCmiLqBYCL0PUW97ka4-Uvd8" />
+            android:value="AIzaSyCYGGhraIyEZ6FM34BfYJIItyDkhgu-EY0" />
 
-        <activity android:name=".activity.Splash"
+        <activity android:name="app.android.serv.activity.Splash"
             android:launchMode="singleTask"
             android:noHistory="true">
             <intent-filter>
@@ -36,22 +36,22 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.Login"
+            android:name="app.android.serv.activity.Login"
             android:launchMode="singleTop"/>
         <activity
-            android:name=".activity.PropertySelection"
+            android:name="app.android.serv.activity.PropertySelection"
             android:label="Property Details"
             android:launchMode="singleTop" />
         <activity
-            android:name=".activity.Properties"
+            android:name="app.android.serv.activity.Properties"
             android:label="My Properties"
             android:launchMode="singleTop" />
         <activity
-            android:name=".activity.Details"
+            android:name="app.android.serv.activity.Details"
             android:windowSoftInputMode="stateHidden"
             android:label="" />
         <activity
-            android:name=".activity.ServiceChooser"
+            android:name="app.android.serv.activity.ServiceChooser"
             android:label="Services" />
 
         <meta-data
@@ -75,16 +75,16 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.Summary"
+            android:name="app.android.serv.activity.Summary"
             android:label="Pending Requests"
             android:launchMode="singleTop" />
         <activity
-            android:name=".activity.MapActivity"
+            android:name="app.android.serv.activity.MapActivity"
             android:windowSoftInputMode="stateHidden"
             android:label="@string/title_activity_properties">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="app.property.management.activity.ServiceChooser" />
+                android:value="app.android.serv.activity.ServiceChooser" />
         </activity>
     </application>
 

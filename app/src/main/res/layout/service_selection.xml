@@ -7,10 +7,10 @@
     android:orientation="vertical"
     android:padding="10dp">
 
-    <app.property.management.view.SquareImageView
+    <app.android.serv.view.SquareImageView
         android:id="@+id/icon"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
         android:layout_gravity="center_horizontal"
         android:layout_marginEnd="20dp"
         android:layout_marginStart="20dp"

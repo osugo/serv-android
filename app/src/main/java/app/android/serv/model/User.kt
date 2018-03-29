@@ -28,9 +28,6 @@ data class User(
         @SerializedName("refresh_token")
         val refreshToken: String? = null,
 
-        @SerializedName("id_pp_number")
-        val idPpNumber: Any? = null,
-
         @SerializedName("updated_at")
         val updatedAt: String? = null,
 

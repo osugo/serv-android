@@ -36,7 +36,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="app.android.serv.activity.Login"
+            android:name="app.android.serv.activity.SignIn"
             android:launchMode="singleTop"/>
         <activity
             android:name="app.android.serv.activity.PropertySelection"

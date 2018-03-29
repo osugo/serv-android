@@ -67,4 +67,26 @@ object RestClient {
                     .build()
             return retrofit
         }
+
+    val headerLessClient: Retrofit
+        get() {
+            dispatcher.maxRequests = 1
+
+            val okClient = OkHttpClient.Builder()
+                    .connectTimeout(30, TimeUnit.SECONDS)
+                    .readTimeout(30, TimeUnit.SECONDS)
+                    .writeTimeout(30, TimeUnit.SECONDS)
+                    .authenticator(tokenAuthenticator)
+                    .addInterceptor(loggingInterceptor)
+                    .dispatcher(dispatcher)
+                    .build()
+
+            retrofit = Retrofit.Builder()
+                    .baseUrl(baseURL)
+                    .addCallAdapterFactory(RxErrorHandlingCallAdapterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create(gson))
+                    .client(okClient)
+                    .build()
+            return retrofit
+        }
 }

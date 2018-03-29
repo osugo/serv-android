@@ -1,21 +1,22 @@
 package app.android.serv.activity
 
-import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.support.v7.app.AppCompatActivity
 import android.view.WindowManager
 import app.android.serv.R
-import app.android.serv.model.User
+import app.android.serv.util.Commons
 import app.android.serv.util.RealmUtil
 import com.bumptech.glide.Glide
 import io.realm.Realm
 import kotlinx.android.synthetic.main.splash.*
+import org.jetbrains.anko.clearTop
+import org.jetbrains.anko.intentFor
 
 /**
  * Created by kombo on 11/01/2018.
  */
-class Splash: AppCompatActivity() {
+class Splash : AppCompatActivity() {
 
     lateinit var realm: Realm
 
@@ -29,15 +30,14 @@ class Splash: AppCompatActivity() {
 
         Glide.with(this).load(R.drawable.splash_image).into(background)
 
-        Handler().postDelayed({initialize()}, 3000)
+        Handler().postDelayed({ initialize() }, 3000)
     }
 
     private fun initialize() {
-        if(realm.where(User::class.java).findAll().isNotEmpty()) {
-            startActivity(Intent(this, ServiceChooser::class.java).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK))
-        } else {
-            startActivity(Intent(this, Login::class.java).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK))
-        }
+        if (Commons.user != null)
+            startActivity(intentFor<ServiceChooser>().clearTop())
+        else
+            startActivity(intentFor<SignIn>().clearTop())
 
         finish()
     }

@@ -2,6 +2,7 @@ package app.android.serv.activity
 
 import android.app.ProgressDialog
 import android.support.v7.app.AppCompatActivity
+import org.greenrobot.eventbus.EventBus
 import org.jetbrains.anko.indeterminateProgressDialog
 
 /**
@@ -9,7 +10,7 @@ import org.jetbrains.anko.indeterminateProgressDialog
  */
 open class BaseActivity : AppCompatActivity() {
 
-    protected var dialog: ProgressDialog? = null
+    private var dialog: ProgressDialog? = null
 
     fun showProgressDialog() {
         if (!isFinishing)
@@ -18,5 +19,15 @@ open class BaseActivity : AppCompatActivity() {
 
     fun hideProgressDialog() {
         dialog?.dismiss()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        EventBus.getDefault().register(this)
+    }
+
+    override fun onStop() {
+        EventBus.getDefault().unregister(this)
+        super.onStop()
     }
 }

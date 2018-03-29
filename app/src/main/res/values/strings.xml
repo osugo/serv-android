@@ -35,4 +35,5 @@
     <string name="service_not_available">The service is not available, please try again.</string>
     <string name="unexpected_error">An unexpected error occurred. Please try again.</string>
     <string name="network_error">A network error occurred. Please check your connection.</string>
+    <string name="network_unavailable">Network unavailable</string>
 </resources>

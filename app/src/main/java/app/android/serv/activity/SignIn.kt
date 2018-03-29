@@ -14,6 +14,7 @@ import app.android.serv.model.ClientCredentials
 import app.android.serv.rest.ErrorHandler
 import app.android.serv.rest.RestClient
 import app.android.serv.rest.RestInterface
+import app.android.serv.util.NetworkHelper
 import app.android.serv.util.PrefUtils
 import com.google.android.gms.auth.api.Auth
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -25,10 +26,10 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.sign_in.*
-import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import org.jetbrains.anko.alert
+import org.jetbrains.anko.design.snackbar
 import org.jetbrains.anko.startActivity
 import org.jetbrains.anko.yesButton
 
@@ -90,8 +91,11 @@ class SignIn : BaseActivity(), GoogleApiClient.OnConnectionFailedListener, View.
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.google -> {
-                showProgressDialog()
-                startActivityForResult(Auth.GoogleSignInApi.getSignInIntent(googleApiClient), GOOGLE_LOGIN)
+                if (NetworkHelper.isOnline(this)) {
+                    showProgressDialog()
+                    startActivityForResult(Auth.GoogleSignInApi.getSignInIntent(googleApiClient), GOOGLE_LOGIN)
+                } else
+                    snackbar(parentLayout, getString(R.string.network_unavailable))
             }
         }
     }
@@ -146,8 +150,6 @@ class SignIn : BaseActivity(), GoogleApiClient.OnConnectionFailedListener, View.
 
     override fun onStart() {
         super.onStart()
-        EventBus.getDefault().register(this)
-
         val operationalPendingResult = Auth.GoogleSignInApi.silentSignIn(googleApiClient)
 
         if (operationalPendingResult.isDone)
@@ -157,11 +159,6 @@ class SignIn : BaseActivity(), GoogleApiClient.OnConnectionFailedListener, View.
                 hideProgressDialog()
                 handleSignInResult(it)
             }
-    }
-
-    override fun onStop() {
-        EventBus.getDefault().unregister(this)
-        super.onStop()
     }
 
     private fun handleSignInResult(googleSignInResult: GoogleSignInResult) {
@@ -183,7 +180,6 @@ class SignIn : BaseActivity(), GoogleApiClient.OnConnectionFailedListener, View.
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe({
                                 hideProgressDialog()
-                                Log.e("User", Gson().toJson(it))
                                 PrefUtils.putString(PrefUtils.USER, Gson().toJson(it))
 
                                 startActivity<ServiceChooser>()
@@ -197,7 +193,7 @@ class SignIn : BaseActivity(), GoogleApiClient.OnConnectionFailedListener, View.
     override fun onDestroy() {
         super.onDestroy()
 
-        if (dialog != null && dialog!!.isShowing) dialog!!.dismiss()
+        hideProgressDialog()
         disposable.clear()
     }
 }

@@ -1,9 +1,11 @@
 package app.android.serv.rest
 
 import app.android.serv.model.ClientCredentials
+import app.android.serv.model.Service
 import app.android.serv.model.User
 import io.reactivex.Observable
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.POST
 
 /**
@@ -13,4 +15,9 @@ interface RestInterface {
 
     @POST("google/signin")
     fun signInWithGoogle(@Body clientCredentials: ClientCredentials): Observable<User>
+
+    @GET("services")
+    fun getServices(): Observable<ArrayList<Service>>
+
+
 }

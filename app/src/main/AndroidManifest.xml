@@ -12,7 +12,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
-        android:name="app.android.serv.House"
+        android:name="app.android.serv.Serv"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -36,7 +36,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="app.android.serv.activity.Login"
+            android:name="app.android.serv.activity.SignIn"
             android:launchMode="singleTop"/>
         <activity
             android:name="app.android.serv.activity.PropertySelection"

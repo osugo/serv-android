@@ -2,7 +2,7 @@
     <string name="app_name">Serv</string>
     <string name="request_confirmation">Your request is being processed. You will receive a notification shortly with a confirmation.</string>
     <string name="ok">OK</string>
-    <string name="server_client_id">275400286091-fl0te1igos6eqhs8ljq4vagr0e9jfrkt.apps.googleusercontent.com</string>
+    <!--<string name="server_client_id">275400286091-fl0te1igos6eqhs8ljq4vagr0e9jfrkt.apps.googleusercontent.com</string>-->
     <string name="loading">Loading…</string>
     <string name="enter_properties">Please Enter Your Properties</string>
     <string name="office_number">Office Number</string>
@@ -17,7 +17,22 @@
     <string name="places_key">AIzaSyDseWgMUQqZCmiLqBYCL0PUW97ka4-Uvd8</string>
     <string name="fabric_key">069fc5277125b94ad2d9806c7015774e75bfec79</string>
 
+    <string name="server_client_id">324835008282-jp06n5ro89lsca7qnbodk5a87upn17ae.apps.googleusercontent.com</string>
+    <string name="serv_client_id">28ede94ade91e642a885bfe92f4f02b79d05b6798c1b929fefabd164c5074b2a</string>
+
     <string name="facebook_app_id">170109426876529</string>
     <string name="fb_login_protocol_scheme">fb170109426876529</string>
     <string name="title_activity_properties">Select Property</string>
+
+    <!--Error strings -->
+    <string name="something_went_wrong">Oops, something went wrong.</string>
+    <string name="access_denied">Sorry, access denied.</string>
+    <string name="request_denied">Sorry, your request has been denied.</string>
+    <string name="unprocessable_entity">Malformed request</string>
+    <string name="not_found">Requested resource is unavailable</string>
+    <string name="error_on_service_access">An error occurred while you were trying to access the service.</string>
+    <string name="service_could_not_complete_request">The service could not complete your request.</string>
+    <string name="service_not_available">The service is not available, please try again.</string>
+    <string name="unexpected_error">An unexpected error occurred. Please try again.</string>
+    <string name="network_error">A network error occurred. Please check your connection.</string>
 </resources>

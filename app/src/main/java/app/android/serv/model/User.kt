@@ -1,15 +1,48 @@
 package app.android.serv.model
 
-import io.realm.RealmObject
-import io.realm.annotations.PrimaryKey
+import com.google.gson.annotations.SerializedName
 
-/**
- * Created by kombo on 21/08/2017.
- */
-open class User(
-        @PrimaryKey var id: String? = null,
-        var name: String? = null,
-        var email: String? = null,
-        var phone: String? = null,
-        var password: String? = null,
-        var photo: String? = null) : RealmObject()
+data class User(
+
+        @SerializedName("google_id")
+        val googleId: String? = null,
+
+        @SerializedName("roles")
+        val roles: List<String?>? = null,
+
+        @SerializedName("last_name")
+        val lastName: String? = null,
+
+        @SerializedName("created_at")
+        val createdAt: String? = null,
+
+        @SerializedName("token_type")
+        val tokenType: String? = null,
+
+        @SerializedName("picture")
+        val picture: String? = null,
+
+        @SerializedName("access_token")
+        val accessToken: String? = null,
+
+        @SerializedName("refresh_token")
+        val refreshToken: String? = null,
+
+        @SerializedName("updated_at")
+        val updatedAt: String? = null,
+
+        @SerializedName("phone_number")
+        val phoneNumber: String? = null,
+
+        @SerializedName("id")
+        val id: String? = null,
+
+        @SerializedName("first_name")
+        val firstName: String? = null,
+
+        @SerializedName("expires_in")
+        val expiresIn: Int? = null,
+
+        @SerializedName("email")
+        val email: String? = null
+)

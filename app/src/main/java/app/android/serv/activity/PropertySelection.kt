@@ -11,7 +11,6 @@ import android.widget.RadioGroup
 import android.widget.Toast
 import app.android.serv.R
 import app.android.serv.adapter.PlaceAutocompleteAdapter
-import app.android.serv.model.Property
 import app.android.serv.util.RealmUtil
 import com.bumptech.glide.Glide
 import com.google.android.gms.common.ConnectionResult

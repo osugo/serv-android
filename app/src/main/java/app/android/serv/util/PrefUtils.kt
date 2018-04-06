@@ -12,6 +12,7 @@ import app.android.serv.Serv
 object PrefUtils {
 
     const val USER = "user"
+    const val CREDENTIALS = "credentials"
 
     fun getBoolean(key: String, defValue: Boolean): Boolean {
         val settings = PreferenceManager.getDefaultSharedPreferences(Serv.INSTANCE)

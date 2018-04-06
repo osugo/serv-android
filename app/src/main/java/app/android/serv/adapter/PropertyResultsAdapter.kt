@@ -12,7 +12,6 @@ import android.widget.TextView
 import app.android.serv.Constants
 import app.android.serv.R
 import app.android.serv.activity.Details
-import app.android.serv.model.Property
 import com.bumptech.glide.Glide
 import io.realm.OrderedRealmCollection
 import io.realm.RealmRecyclerViewAdapter

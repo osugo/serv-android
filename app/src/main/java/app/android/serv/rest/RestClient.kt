@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit
  */
 object RestClient {
 
-    private const val baseURL = "http://mtandao.space:5000/"
+    private const val baseURL = "http://serv.mtandao.space/"
 
     private lateinit var retrofit: Retrofit
     private val tokenAuthenticator = TokenAuthenticator()
@@ -48,7 +48,7 @@ object RestClient {
                         val original = chain.request()
 
                         val request = original.newBuilder()
-                                .addHeader("Authorization", "Bearer " + Commons.user!!.accessToken)
+                                .addHeader("Authorization", "Bearer " + if (Commons.credentials == null) Commons.user!!.accessToken else Commons.credentials!!.accessToken)
                                 .addHeader("Content-Type", "application/json")
                                 .build()
 

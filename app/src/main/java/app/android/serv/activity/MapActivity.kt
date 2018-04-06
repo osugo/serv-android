@@ -1,7 +1,8 @@
 package app.android.serv.activity
 
+import android.annotation.SuppressLint
+import android.app.ProgressDialog
 import android.content.DialogInterface
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
@@ -17,11 +18,16 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.FrameLayout
 import android.widget.TextView
-import android.widget.Toast
 import app.android.serv.Constants
 import app.android.serv.R
 import app.android.serv.adapter.PlaceAutocompleteAdapter
+import app.android.serv.event.ErrorEvent
 import app.android.serv.model.Property
+import app.android.serv.model.PropertyType
+import app.android.serv.rest.ErrorHandler
+import app.android.serv.rest.RestClient
+import app.android.serv.rest.RestInterface
+import app.android.serv.util.NetworkHelper
 import app.android.serv.util.RealmUtil
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
@@ -40,17 +46,20 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
-import io.reactivex.Completable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
 import io.realm.Realm
-import io.realm.exceptions.RealmException
+import io.realm.RealmList
 import kotlinx.android.synthetic.main.property_selection.*
 import kotlinx.android.synthetic.main.toolbar.*
-import org.jetbrains.anko.selector
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
+import org.jetbrains.anko.*
 
 class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener, AdapterView.OnItemClickListener {
 
-
-    private lateinit var realm: Realm
     private lateinit var map: GoogleMap
 
     private lateinit var mGeoDataClient: GeoDataClient
@@ -85,15 +94,27 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
     private var property: Property? = null
 
     private var name: String? = null
-    private var propertyLocation: String? = null
+    private var propertyLocation: LatLng? = null
     private var propertyType: String? = null
     private var service: String? = null
+    private var dialog: ProgressDialog? = null
+    private var propertyTypes: RealmList<PropertyType>? = null
+
+    private val disposable = CompositeDisposable()
+
+    private val realm by lazy {
+        Realm.getInstance(RealmUtil.getRealmConfig())
+    }
+
+    private val restInterface by lazy {
+        RestClient.client.create(RestInterface::class.java)
+    }
 
     companion object {
         val TAG: String = MapActivity::class.java.simpleName
         // Keys for storing activity state.
-        val KEY_CAMERA_POSITION = "camera_position"
-        val KEY_LOCATION = "location"
+        const val KEY_CAMERA_POSITION = "camera_position"
+        const val KEY_LOCATION = "location"
         val BOUNDS_GREATER_SYDNEY = LatLngBounds(LatLng(-34.041458, 150.790100), LatLng(-33.682247, 151.383362));
     }
 
@@ -102,7 +123,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
         val placeId = item.placeId
         val primaryText = item.getPrimaryText(null)
 
-        Log.i(PropertySelection.TAG, "Autocomplete item selected: " + primaryText)
+        Log.i(PropertySelection.TAG, "Autocomplete item selected: $primaryText")
 
         /*
              Issue a request to the Places Geo Data API to retrieve a Place object with additional
@@ -111,7 +132,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
         val placeResult = Places.GeoDataApi.getPlaceById(googleApiClient, placeId)
         placeResult.setResultCallback(updatePlaceDetailsCallback)
 
-        Toast.makeText(applicationContext, "Clicked: " + primaryText, Toast.LENGTH_SHORT).show()
         Log.i(PropertySelection.TAG, "Called getPlaceById to get Place details for " + placeId!!)
     }
 
@@ -130,7 +150,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
 
         setContentView(R.layout.activity_properties)
 
-        realm = Realm.getInstance(RealmUtil.getRealmConfig())
         service = intent.getStringExtra(Constants.SERVICE)
 
         setSupportActionBar(toolbar)
@@ -297,7 +316,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
          * onRequestPermissionsResult.
          */
         if (ContextCompat.checkSelfPermission(this.applicationContext,
-                android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                        android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             mLocationPermissionGranted = true
         } else {
             ActivityCompat.requestPermissions(this,
@@ -345,26 +364,96 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
      * Show the list of property types to select from
      */
     private fun showPropertyTypes() {
-        val types = listOf("Apartment", "Estate", "Commercial")
+        val results = realm.where(PropertyType::class.java).findAll()
+
+        if (results.isNotEmpty()) {
+            val list = RealmList<PropertyType>()
+            list.addAll(results)
+
+            propertyTypes = list
+
+            showTypes(results.map { it.name!! })
+        } else if (NetworkHelper.isOnline(this)) {
+            if (!isFinishing) {
+                showProgressDialog()
+
+                disposable.add(
+                        restInterface.getPropertyTypes()
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe({
+                                    hideProgressDialog()
+                                    propertyTypes = it
+                                    showTypes(it.map { it.name!! })
+                                }) {
+                                    hideProgressDialog()
+                                    ErrorHandler.showError(it)
+                                }
+                )
+            }
+        } else {
+            toast(getString(R.string.network_unavailable))
+        }
+    }
+
+    private fun showTypes(types: List<String>) {
         selector("Property Type", types, { _, i ->
-            propertyType = types[i]
-            createProperty()
+            createProperty(getPropertyTypeId(types[i])!!)
             Log.e(TAG, "Property type: $propertyType")
         })
     }
 
-    private fun createProperty() {
-        Completable.fromAction({
-            try {
-                realm.executeTransaction {
-                    val property = Property(name, propertyLocation, propertyType)
-                    realm.copyToRealmOrUpdate(property)
-                }
-            } catch (ex: RealmException) {
-                Log.e(TAG, ex.localizedMessage, ex)
+    private fun createProperty(propertyTypeId: String) {
+        if (NetworkHelper.isOnline(this)) {
+            if (!isFinishing) {
+                showProgressDialog()
+
+                disposable.add(
+                        restInterface.createProperty(
+                                Property(null, null, null, propertyTypeId,
+                                        propertyLocation!!.longitude.toString(), propertyLocation!!.longitude.toString(), null, null))
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe({ property ->
+                                    Realm.getInstance(RealmUtil.getRealmConfig()).use {
+                                        it.copyToRealmOrUpdate(property)
+                                    }
+
+                                    hideProgressDialog()
+
+                                    startActivity(intentFor<Details>(Constants.PROPERTY to name, Constants.SERVICE to service))
+                                }) {
+                                    hideProgressDialog()
+                                    ErrorHandler.showError(it)
+                                }
+                )
             }
-        }).subscribe {
-            startActivity(Intent(this, Details::class.java).putExtra(Constants.PROPERTY, name).putExtra(Constants.SERVICE, service))
+        } else {
+            toast(getString(R.string.network_unavailable))
+        }
+    }
+
+    private fun getPropertyTypeId(name: String): String? {
+        var id: String? = null
+
+        Realm.getInstance(RealmUtil.getRealmConfig()).use {
+            val result = it.where(PropertyType::class.java).equalTo("name", name).findFirst()
+
+            if (result != null)
+                id = it.copyFromRealm(result).id
+        }
+
+        return id
+    }
+
+    private fun showProgressDialog() {
+        dialog = indeterminateProgressDialog("Please wait...")
+    }
+
+
+    private fun hideProgressDialog() {
+        if (dialog != null && dialog!!.isShowing) {
+            dialog!!.dismiss()
         }
     }
 
@@ -372,11 +461,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
      * Prompts the user to select the current place from a list of likely places, and shows the
      * current place on the map - provided the user has granted location permission.
      */
+    @SuppressLint("RestrictedApi")
     private fun showCurrentPlace() {
-        if (map == null) {
-            return
-        }
-
         if (mLocationPermissionGranted) {
             // Get the likely places - that is, the businesses and other points of interest that
             // are the best match for the device's current location.
@@ -483,16 +569,13 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, DEFAULT_ZOOM.toFloat()))
 
         name = title
-        propertyLocation = address
+        propertyLocation = latLng
     }
 
     /**
      * Updates the map's UI settings based on whether the user has granted location permission.
      */
     private fun updateLocationUI() {
-        if (map == null) {
-            return
-        }
         try {
             if (mLocationPermissionGranted) {
                 map.isMyLocationEnabled = true
@@ -508,8 +591,29 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        EventBus.getDefault().register(this)
+    }
+
+    override fun onStop() {
+        EventBus.getDefault().unregister(this)
+        super.onStop()
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onErrorEvent(errorEvent: ErrorEvent) {
+        if (!isFinishing)
+            alert(errorEvent.message) {
+                yesButton {
+                    it.dismiss()
+                }
+            }.show()
+    }
+
     override fun onDestroy() {
         super.onDestroy()
+        disposable.clear()
         realm.close()
     }
 }

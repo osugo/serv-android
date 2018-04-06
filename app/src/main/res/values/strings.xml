@@ -24,6 +24,9 @@
     <string name="fb_login_protocol_scheme">fb170109426876529</string>
     <string name="title_activity_properties">Select Property</string>
 
+    <string name="client_id">28ede94ade91e642a885bfe92f4f02b79d05b6798c1b929fefabd164c5074b2a</string>
+    <string name="client_secret">0bd9087a102136fbfe17e3ce094e649819ac0db67a587d019cb6b9433e948a90</string>
+
     <!--Error strings -->
     <string name="something_went_wrong">Oops, something went wrong.</string>
     <string name="access_denied">Sorry, access denied.</string>

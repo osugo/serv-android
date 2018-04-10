@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <TextView
+        android:id="@+id/propertyTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Property Type"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+
+    <RadioGroup
+        android:id="@+id/propertyType"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/propertyTypeText"
+        android:layout_marginBottom="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginStart="10dp"
+        android:orientation="horizontal"
+        android:padding="5dp">
+
+        <RadioButton
+            android:id="@+id/apartment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:enabled="true"
+            android:text="Apartments" />
+
+        <RadioButton
+            android:id="@+id/estate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Estate" />
+
+    </RadioGroup>
+
+    <TextView
+        android:id="@+id/issueTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Describe Issue"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+
+    <EditText
+        android:id="@+id/description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/edittext_bg"
+        android:inputType="textMultiLine"
+        android:lines="4"
+        android:maxLines="4" />
+
+    <TextView
+        android:id="@+id/calendarTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="Pick Schedule"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+
+    <!-- Customize this to desired feel -->
+    <devs.mulham.horizontalcalendar.HorizontalCalendarView
+        android:id="@+id/calendarView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        app:selectedDateBackground="@drawable/edittext_bg"
+        app:selectorColor="#c62828"
+        app:textColorNormal="#bababa"
+        app:textColorSelected="#FFFF" />
+
+    <Button
+        android:id="@+id/submit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:background="@color/BrightOrange"
+        android:text="Send Request"
+        android:textAllCaps="true"
+        android:textColor="#fff"
+        android:textStyle="bold" />
+
+</LinearLayout>

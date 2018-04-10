@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/descriptionLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#e2e2e2"
+        android:padding="15dp"
+        android:text="@string/describe_issue"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/descriptionTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/title"
+        android:layout_marginEnd="15dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="20dp"
+        android:text="Description"
+        android:textSize="16sp" />
+
+    <EditText
+        android:id="@+id/problemDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/descriptionTitle"
+        android:layout_marginEnd="15dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="7dp"
+        android:background="@drawable/text_bg"
+        android:imeOptions="actionDone"
+        android:inputType="textMultiLine|textCapSentences"
+        android:lines="3"
+        android:maxLines="3" />
+
+    <Button
+        android:id="@+id/proceed"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/problemDescription"
+        android:layout_marginEnd="15dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="25dp"
+        android:background="@color/ProminentBlue"
+        android:text="Done"
+        android:textColor="@android:color/white" />
+
+</RelativeLayout>

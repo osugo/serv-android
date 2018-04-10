@@ -5,7 +5,6 @@ package app.android.serv
  */
 object Constants {
 
-    const val SERVICE= "service"
     const val SERVICE_ID = "serviceId"
-    const val PROPERTY= "property"
+    const val PROPERTY_ID = "propertyId"
 }

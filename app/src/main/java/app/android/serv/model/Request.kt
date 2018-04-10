@@ -1,16 +1,45 @@
 package app.android.serv.model
 
-import io.realm.RealmObject
-import io.realm.annotations.PrimaryKey
+import com.google.gson.annotations.SerializedName
 
-/**
- * Created by kombo on 24/08/2017.
- */
-open class Request(
-        @PrimaryKey
-        var timestamp: Long? = null,
-        var service: OfferedService? = null,
-        var property: Property? = null,
-        var description: String? = null,
-        var date: String? = null,
-        var time: String? = null) : RealmObject()
+data class Request(
+
+        @field:SerializedName("service_name")
+        val serviceName: String? = null,
+
+        @field:SerializedName("user_name")
+        val userName: String? = null,
+
+        @field:SerializedName("description")
+        val description: String? = null,
+
+        @field:SerializedName("created_at")
+        val createdAt: String? = null,
+
+        @field:SerializedName("property_id")
+        val propertyId: String? = null,
+
+        @field:SerializedName("property_name")
+        val propertyName: String? = null,
+
+        @field:SerializedName("updated_at")
+        val updatedAt: String? = null,
+
+        @field:SerializedName("user_id")
+        val userId: String? = null,
+
+        @field:SerializedName("service_id")
+        val serviceId: String? = null,
+
+        @field:SerializedName("name")
+        val name: String? = null,
+
+        @field:SerializedName("id")
+        val id: String? = null,
+
+        @field:SerializedName("start_date")
+        val startDate: String? = null,
+
+        @field:SerializedName("status")
+        val status: Int? = null
+)

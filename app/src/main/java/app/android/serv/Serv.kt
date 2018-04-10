@@ -1,6 +1,7 @@
 package app.android.serv
 
 import android.support.multidex.MultiDexApplication
+import app.android.serv.model.User
 import app.android.serv.util.RealmUtil
 import com.crashlytics.android.answers.Answers
 import com.facebook.FacebookSdk

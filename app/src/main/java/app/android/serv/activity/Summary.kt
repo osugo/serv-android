@@ -7,7 +7,6 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.MenuItem
 import app.android.serv.R
 import app.android.serv.adapter.RequestsAdapter
-import app.android.serv.model.Request
 import app.android.serv.util.RealmUtil
 import app.android.serv.view.DividerItemDecoration
 import io.realm.Realm

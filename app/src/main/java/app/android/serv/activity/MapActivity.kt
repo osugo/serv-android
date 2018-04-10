@@ -96,7 +96,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
     private var name: String? = null
     private var propertyLocation: LatLng? = null
     private var propertyType: String? = null
-    private var service: String? = null
+    private var serviceId: String? = null
     private var dialog: ProgressDialog? = null
     private var propertyTypes: RealmList<PropertyType>? = null
 
@@ -123,7 +123,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
         val placeId = item.placeId
         val primaryText = item.getPrimaryText(null)
 
-        Log.i(PropertySelection.TAG, "Autocomplete item selected: $primaryText")
+        Log.i(TAG, "Autocomplete item selected: $primaryText")
 
         /*
              Issue a request to the Places Geo Data API to retrieve a Place object with additional
@@ -132,7 +132,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
         val placeResult = Places.GeoDataApi.getPlaceById(googleApiClient, placeId)
         placeResult.setResultCallback(updatePlaceDetailsCallback)
 
-        Log.i(PropertySelection.TAG, "Called getPlaceById to get Place details for " + placeId!!)
+        Log.i(TAG, "Called getPlaceById to get Place details for " + placeId!!)
     }
 
     override fun onConnectionFailed(connectionResult: ConnectionResult) {
@@ -150,7 +150,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
 
         setContentView(R.layout.activity_properties)
 
-        service = intent.getStringExtra(Constants.SERVICE)
+        serviceId = intent.getStringExtra(Constants.SERVICE_ID)
 
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -242,7 +242,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
      */
     private val updatePlaceDetailsCallback = ResultCallback<PlaceBuffer> { places ->
         if (!places.status.isSuccess) {
-            Log.e(PropertySelection.TAG, "Place query did not complete. Error: " + places.status.toString())
+            Log.e(TAG, "Place query did not complete. Error: " + places.status.toString())
             places.release()
             return@ResultCallback
         }
@@ -251,7 +251,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
 
         location.setText(place.name)
 
-        Log.e(PropertySelection.TAG, place.address.toString())
+        Log.e(TAG, place.address.toString())
 
         showMarker(place.latLng, place.name.toString(), place.address.toString())
 
@@ -269,7 +269,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
 //            mPlaceDetailsAttribution.setText(Html.fromHtml(thirdPartyAttribution.toString()))
 //        }
 
-        Log.i(PropertySelection.TAG, "Place details received: " + place.name)
+        Log.i(TAG, "Place details received: " + place.name)
 
         places.release()
     }
@@ -421,7 +421,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
 
                                     hideProgressDialog()
 
-                                    startActivity(intentFor<Details>(Constants.PROPERTY to name, Constants.SERVICE to service))
+                                    startActivity(intentFor<Details>(Constants.PROPERTY_ID to property.id, Constants.SERVICE_ID to serviceId))
                                 }) {
                                     hideProgressDialog()
                                     ErrorHandler.showError(it)

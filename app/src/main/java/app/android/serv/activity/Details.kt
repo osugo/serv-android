@@ -1,58 +1,61 @@
 package app.android.serv.activity
 
-import android.content.Intent
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import android.util.Log
-import android.view.MenuItem
 import android.view.View
 import app.android.serv.Constants
 import app.android.serv.R
-import app.android.serv.model.OfferedService
-import app.android.serv.model.Property
 import app.android.serv.model.Request
-import app.android.serv.util.RealmUtil
+import app.android.serv.rest.ErrorHandler
+import app.android.serv.rest.RestClient
+import app.android.serv.rest.RestInterface
+import app.android.serv.util.Commons
+import app.android.serv.util.NetworkHelper
 import devs.mulham.horizontalcalendar.HorizontalCalendar
 import devs.mulham.horizontalcalendar.utils.HorizontalCalendarListener
-import io.reactivex.Completable
-import io.realm.Realm
-import io.realm.exceptions.RealmException
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.details.*
 import kotlinx.android.synthetic.main.toolbar.*
+import org.jetbrains.anko.alert
 import org.jetbrains.anko.design.snackbar
-import org.jetbrains.anko.toast
+import org.jetbrains.anko.yesButton
 import java.util.*
 
 
 /**
  * Created by kombo on 07/10/2017.
  */
-class Details : AppCompatActivity(), View.OnClickListener {
+class Details : BaseActivity(), View.OnClickListener {
 
-    private lateinit var realm: Realm
     private var time: String? = null
     private var date: String? = null
-    private var property: Property? = null
+    private var propertyId: String? = null
     private var desc: String? = null
-    private var service: OfferedService? = null
+    private var serviceId: String? = null
+
+    private val disposable = CompositeDisposable()
+
+    private val restInterface by lazy {
+        RestClient.client.create(RestInterface::class.java)
+    }
 
     companion object {
-        val TAG = Details::class.java.simpleName!!
+        val TAG = Details::class.java.simpleName
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.details)
 
-        realm = Realm.getInstance(RealmUtil.getRealmConfig())
-
         setSupportActionBar(toolbar)
         supportActionBar?.setHomeButtonEnabled(true)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = "Schedule"
 
-        property = realm.where(Property::class.java).equalTo("name", intent.getStringExtra(Constants.PROPERTY)).findFirst()
-        service = realm.where(OfferedService::class.java).equalTo("title", intent.getStringExtra(Constants.SERVICE)).findFirst()
+        propertyId = intent.getStringExtra(Constants.PROPERTY_ID)
+        serviceId = intent.getStringExtra(Constants.SERVICE_ID)
 
         /* end after 1 month from now */
         val endDate = Calendar.getInstance()
@@ -85,46 +88,66 @@ class Details : AppCompatActivity(), View.OnClickListener {
 
     override fun onClick(v: View?) {
         desc = description.text.toString()
-        if(isEmpty(desc)){
+        if (isEmpty(desc)) {
             snackbar(parentLayout, "Please enter a description")
             return
         }
 
-        if(!isEmpty(desc)){
-           Completable.fromAction({
-               val request = Request(System.currentTimeMillis(), service, property, desc, date, time)
+        if (!isEmpty(desc) && !isFinishing) {
+            if (NetworkHelper.isOnline(this)) {
+                disposable.add(
+                        restInterface.makeRequest(
+                                Request(null, null, desc, null, propertyId, null, null,
+                                        Commons.user!!.id, serviceId, null, null, null, null))
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe({
+                                    hideProgressDialog()
 
-               try {
-                   realm.executeTransaction {
-                       realm.copyToRealmOrUpdate(request)
-                   }
-               } catch(ex: RealmException){
-                   Log.e(TAG, ex.localizedMessage, ex)
-               }
-
-               toast("Request has been logged")
-           }).subscribe({
-               startActivity(Intent(this, Summary::class.java).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP))
-               finish()
-           })
+                                    showMessage()
+                                }) {
+                                    hideProgressDialog()
+                                    ErrorHandler.showError(it)
+                                }
+                )
+            } else {
+                snackbar(parentLayout, getString(R.string.network_unavailable))
+            }
+//           Completable.fromAction({
+//               val request = Request(System.currentTimeMillis(), service, property, desc, date, time)
+//
+//               try {
+//                   realm.executeTransaction {
+//                       realm.copyToRealmOrUpdate(request)
+//                   }
+//               } catch(ex: RealmException){
+//                   Log.e(TAG, ex.localizedMessage, ex)
+//               }
+//
+//               toast("Request has been logged")
+//           }).subscribe({
+//               startActivity(Intent(this, Summary::class.java).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP))
+//               finish()
+//           })
         }
     }
 
-    private fun isEmpty(text: String?) : Boolean {
+    private fun showMessage() {
+        if (!isFinishing)
+            alert("Your request has been made. We will notify you shortly") {
+                yesButton {
+                    it.dismiss()
+                }
+            }.show()
+    }
+
+    private fun isEmpty(text: String?): Boolean {
         return text!!.isBlank() or text.isEmpty()
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean = when (item?.itemId) {
-        android.R.id.home -> {
-            onBackPressed()
-            true
-        }
-        else -> false
     }
 
     override fun onDestroy() {
         super.onDestroy()
 
-        realm.close()
+        disposable.clear()
     }
 }

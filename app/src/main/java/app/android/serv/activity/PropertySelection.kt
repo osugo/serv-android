@@ -79,7 +79,7 @@ class PropertySelection : AppCompatActivity(), View.OnClickListener, RadioGroup.
         val placeId = item.placeId
         val primaryText = item.getPrimaryText(null)
 
-        Log.i(TAG, "Autocomplete item selected: " + primaryText)
+        Log.i(TAG, "Autocomplete item selected: $primaryText")
 
         /*
              Issue a request to the Places Geo Data API to retrieve a Place object with additional
@@ -88,7 +88,7 @@ class PropertySelection : AppCompatActivity(), View.OnClickListener, RadioGroup.
         val placeResult = Places.GeoDataApi.getPlaceById(googleApiClient, placeId)
         placeResult.setResultCallback(updatePlaceDetailsCallback)
 
-        Toast.makeText(applicationContext, "Clicked: " + primaryText, Toast.LENGTH_SHORT).show()
+        Toast.makeText(applicationContext, "Clicked: $primaryText", Toast.LENGTH_SHORT).show()
         Log.i(TAG, "Called getPlaceById to get Place details for " + placeId!!)
     }
 

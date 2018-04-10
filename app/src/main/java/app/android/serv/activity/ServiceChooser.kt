@@ -2,6 +2,7 @@ package app.android.serv.activity
 
 import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
+import android.util.Log
 import android.view.MenuItem
 import app.android.serv.R
 import app.android.serv.adapter.ServicesAdapter
@@ -11,10 +12,13 @@ import app.android.serv.rest.ErrorHandler
 import app.android.serv.rest.RestClient
 import app.android.serv.rest.RestInterface
 import app.android.serv.util.NetworkHelper
+import app.android.serv.util.RealmUtil
 import app.android.serv.view.GridItemDecoration
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import io.realm.Realm
+import io.realm.exceptions.RealmException
 import kotlinx.android.synthetic.main.service_selection_layout.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.greenrobot.eventbus.Subscribe
@@ -102,8 +106,22 @@ class ServiceChooser : BaseActivity() {
                 }
             }
 
+            saveServicesToRealm(services)
+
             val adapter = ServicesAdapter(this, services)
             categories.adapter = adapter
+        }
+    }
+
+    private fun saveServicesToRealm(services: ArrayList<Service>){
+        try {
+            Realm.getInstance(RealmUtil.getRealmConfig()).use {
+                it.executeTransaction{
+                    it.copyToRealmOrUpdate(services)
+                }
+            }
+        } catch (e: RealmException){
+            Log.e(TAG, e.localizedMessage, e)
         }
     }
 
@@ -119,5 +137,9 @@ class ServiceChooser : BaseActivity() {
         super.onDestroy()
         hideProgressDialog()
         disposable.clear()
+    }
+
+    companion object {
+        private val TAG = ServiceChooser::class.java.simpleName
     }
 }

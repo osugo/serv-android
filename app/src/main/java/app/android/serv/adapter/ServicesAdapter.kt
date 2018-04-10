@@ -8,25 +8,27 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
+import app.android.serv.Constants
 import app.android.serv.R
 import app.android.serv.activity.MapActivity
 import app.android.serv.model.Service
 import app.android.serv.view.SquareImageView
 import org.jetbrains.anko.find
+import org.jetbrains.anko.intentFor
 
 /**
  * Created by kombo on 07/10/2017.
  */
 class ServicesAdapter(private val context: Context, private val services: ArrayList<Service>)
-    : RecyclerView.Adapter<ServicesAdapter.ViewHolder>() {
+    : RecyclerView.Adapter<ServicesAdapter.ViewHolder>(){
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent?.context).inflate(R.layout.service_selection, parent, false)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.service_selection, parent, false)
         return ViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
-        holder?.bindItems(context, services[holder.adapterPosition])
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        holder.bindItems(context, services[holder.adapterPosition])
     }
 
     override fun getItemCount(): Int = services.size
@@ -49,7 +51,7 @@ class ServicesAdapter(private val context: Context, private val services: ArrayL
 //                if (realm.where(Property::class.java).findAll().isNotEmpty())
 //                    context.startActivity(Intent(context, Properties::class.java).putExtra(Constants.SERVICE, offeredService.title))
 //                else
-//                    context.startActivity(Intent(context, MapActivity::class.java).putExtra(Constants.SERVICE, offeredService.title))
+                context.startActivity(context.intentFor<MapActivity>(Constants.SERVICE_ID to service.id))
             }
         }
     }

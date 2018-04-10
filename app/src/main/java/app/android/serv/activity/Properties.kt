@@ -9,6 +9,7 @@ import android.view.MenuItem
 import app.android.serv.Constants
 import app.android.serv.R
 import app.android.serv.adapter.PropertyResultsAdapter
+import app.android.serv.model.Property
 import app.android.serv.util.RealmUtil
 import app.android.serv.view.DividerItemDecoration
 import io.realm.Realm

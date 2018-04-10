@@ -1,20 +1,23 @@
 package app.android.serv.model
 
 import com.google.gson.annotations.SerializedName
+import io.realm.RealmObject
+import io.realm.annotations.PrimaryKey
 
-data class Service(
+open class Service(
 
         @SerializedName("updated_at")
-        val updatedAt: String? = null,
+        var updatedAt: String? = null,
 
         @SerializedName("name")
-        val name: String? = null,
+        var name: String? = null,
 
         @SerializedName("created_at")
-        val createdAt: String? = null,
+        var createdAt: String? = null,
 
+        @PrimaryKey
         @SerializedName("id")
-        val id: String? = null,
+        var id: String? = null,
 
         var icon: Int? = null
-)
+): RealmObject()

@@ -180,7 +180,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
             mapFragment.getMapAsync(this)
         }, 500)
 
-        done.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_add_location))
+        done.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_done))
         done.setOnClickListener {
             showPropertyTypes()
         }

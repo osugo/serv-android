@@ -7,6 +7,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.MenuItem
 import app.android.serv.R
 import app.android.serv.adapter.RequestsAdapter
+import app.android.serv.model.Request
 import app.android.serv.util.RealmUtil
 import app.android.serv.view.DividerItemDecoration
 import io.realm.Realm
@@ -30,15 +31,15 @@ class Summary : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setHomeButtonEnabled(true)
 
-        val requests = realm.where(Request::class.java).findAll()
-
-        if (requests.isNotEmpty()) {
-            recycler.layoutManager = LinearLayoutManager(this)
-            recycler.addItemDecoration(DividerItemDecoration(this))
-
-            val adapter = RequestsAdapter(this, requests)
-            recycler.adapter = adapter
-        }
+//        val requests = realm.where(Request::class.java).findAll()
+//
+//        if (requests.isNotEmpty()) {
+//            recycler.layoutManager = LinearLayoutManager(this)
+//            recycler.addItemDecoration(DividerItemDecoration(this))
+//
+//            val adapter = RequestsAdapter(this, requests)
+//            recycler.adapter = adapter
+//        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean = when (item?.itemId) {

@@ -4,6 +4,7 @@ import android.app.Dialog
 import android.os.Bundle
 import android.support.v4.app.DialogFragment
 import android.support.v7.app.AlertDialog
+import android.support.v7.app.AppCompatActivity
 import app.android.serv.R
 
 /**
@@ -18,7 +19,7 @@ class InfoDialog : DialogFragment() {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val builder = AlertDialog.Builder(activity)
+        val builder = AlertDialog.Builder(activity as AppCompatActivity)
         builder.setMessage(getString(R.string.request_confirmation))
         builder.setPositiveButton(R.string.ok) { _, _ ->
             dismissAllowingStateLoss()

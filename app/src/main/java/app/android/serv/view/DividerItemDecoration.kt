@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import android.support.v4.content.ContextCompat
+import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.RecyclerView
 import app.android.serv.R
 
@@ -12,7 +13,7 @@ import app.android.serv.R
  */
 class DividerItemDecoration(context: Context) : RecyclerView.ItemDecoration() {
 
-    private var mDivider: Drawable = ContextCompat.getDrawable(context, R.drawable.divider)
+    private var mDivider: Drawable? = ContextCompat.getDrawable(context, R.drawable.divider)
 
     override fun onDrawOver(c: Canvas, parent: RecyclerView, state: RecyclerView.State?) {
         val left = parent.paddingLeft
@@ -27,8 +28,8 @@ class DividerItemDecoration(context: Context) : RecyclerView.ItemDecoration() {
             val top = child.bottom + params.bottomMargin
             val bottom = top + mDivider.intrinsicHeight
 
-            mDivider.setBounds(left, top, right, bottom)
-            mDivider.draw(c)
+            mDivider?.setBounds(left, top, right, bottom)
+            mDivider?.draw(c)
         }
     }
 }

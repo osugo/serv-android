@@ -8,7 +8,7 @@ import org.jetbrains.anko.indeterminateProgressDialog
 /**
  * Created by kombo on 28/03/2018.
  */
-open class BaseActivity : AppCompatActivity() {
+abstract class BaseActivity : AppCompatActivity() {
 
     private var dialog: ProgressDialog? = null
 

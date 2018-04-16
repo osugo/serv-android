@@ -24,7 +24,7 @@
             android:value="069fc5277125b94ad2d9806c7015774e75bfec79" />
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyCYGGhraIyEZ6FM34BfYJIItyDkhgu-EY0" />
+            android:value="AIzaSyDmndSNV2N64Vjy8_mma8cjYtHFKb_aluw" />
 
         <activity android:name="app.android.serv.activity.Splash"
             android:launchMode="singleTask"
@@ -39,10 +39,6 @@
             android:name="app.android.serv.activity.SignIn"
             android:launchMode="singleTop"/>
         <activity
-            android:name="app.android.serv.activity.PropertySelection"
-            android:label="Property Details"
-            android:launchMode="singleTop" />
-        <activity
             android:name="app.android.serv.activity.Properties"
             android:label="My Properties"
             android:launchMode="singleTop" />
@@ -52,7 +48,7 @@
             android:label="" />
         <activity
             android:name="app.android.serv.activity.ServiceChooser"
-            android:label="Services" />
+            android:label="Choose Service" />
 
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"

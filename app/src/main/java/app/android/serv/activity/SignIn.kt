@@ -16,6 +16,7 @@ import app.android.serv.rest.RestClient
 import app.android.serv.rest.RestInterface
 import app.android.serv.util.NetworkHelper
 import app.android.serv.util.PrefUtils
+import com.bumptech.glide.Glide
 import com.google.android.gms.auth.api.Auth
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.auth.api.signin.GoogleSignInResult
@@ -29,8 +30,9 @@ import kotlinx.android.synthetic.main.sign_in.*
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import org.jetbrains.anko.alert
+import org.jetbrains.anko.clearTop
 import org.jetbrains.anko.design.snackbar
-import org.jetbrains.anko.startActivity
+import org.jetbrains.anko.intentFor
 import org.jetbrains.anko.yesButton
 
 /**
@@ -69,7 +71,7 @@ class SignIn : BaseActivity(), GoogleApiClient.OnConnectionFailedListener, View.
                 yesButton {
                     it.dismiss()
                 }
-            }
+            }.show()
         }
     }
 
@@ -77,6 +79,8 @@ class SignIn : BaseActivity(), GoogleApiClient.OnConnectionFailedListener, View.
         window.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.sign_in)
+
+        Glide.with(this).load(R.drawable.splash_image).into(background)
 
         getLocationPermission()
 
@@ -182,7 +186,7 @@ class SignIn : BaseActivity(), GoogleApiClient.OnConnectionFailedListener, View.
                                 hideProgressDialog()
                                 PrefUtils.putString(PrefUtils.USER, Gson().toJson(it))
 
-                                startActivity<ServiceChooser>()
+                                startActivity(intentFor<ServiceChooser>().clearTop())
                             }) {
                                 ErrorHandler.showError(it)
                             }

@@ -1,10 +1,11 @@
 package app.android.serv.activity
 
 import android.os.Bundle
-import android.util.Log
+import android.view.MenuItem
 import android.view.View
 import app.android.serv.Constants
 import app.android.serv.R
+import app.android.serv.event.ErrorEvent
 import app.android.serv.model.Request
 import app.android.serv.rest.ErrorHandler
 import app.android.serv.rest.RestClient
@@ -18,8 +19,12 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.details.*
 import kotlinx.android.synthetic.main.toolbar.*
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
 import org.jetbrains.anko.alert
+import org.jetbrains.anko.clearTop
 import org.jetbrains.anko.design.snackbar
+import org.jetbrains.anko.intentFor
 import org.jetbrains.anko.yesButton
 import java.util.*
 
@@ -33,6 +38,7 @@ class Details : BaseActivity(), View.OnClickListener {
     private var date: String? = null
     private var propertyId: String? = null
     private var desc: String? = null
+    private var title: String? = null
     private var serviceId: String? = null
 
     private val disposable = CompositeDisposable()
@@ -43,6 +49,17 @@ class Details : BaseActivity(), View.OnClickListener {
 
     companion object {
         val TAG = Details::class.java.simpleName
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onErrorEvent(errorEvent: ErrorEvent) {
+        if (!isFinishing) {
+            alert(errorEvent.message) {
+                yesButton {
+                    it.dismiss()
+                }
+            }.show()
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -74,13 +91,11 @@ class Details : BaseActivity(), View.OnClickListener {
 
             override fun onDateSelected(calendar: Calendar?, position: Int) {
                 date = android.text.format.DateFormat.format("dd/MM/yyyy", calendar!!).toString()
-                Log.e(TAG, "Date is: $date")
             }
         }
 
         timePicker.setOnTimeChangedListener { _, hourOfDay, minute ->
             time = "$hourOfDay : $minute"
-            Log.e(TAG, "Time is $time")
         }
 
         submit.setOnClickListener(this)
@@ -88,17 +103,34 @@ class Details : BaseActivity(), View.OnClickListener {
 
     override fun onClick(v: View?) {
         desc = description.text.toString()
+        title = name.text.toString()
+
+        if (isEmpty(title)) {
+            snackbar(parentLayout, "Please enter a title")
+            return
+        }
+
         if (isEmpty(desc)) {
             snackbar(parentLayout, "Please enter a description")
             return
         }
 
-        if (!isEmpty(desc) && !isFinishing) {
+        if (date == null) {
+            snackbar(parentLayout, "Please choose a date")
+            return
+        }
+
+        if (time == null) {
+            snackbar(parentLayout, "Please choose a time")
+        }
+
+        if (!isEmpty(desc) && !isEmpty(title) && propertyId != null && date != null && time != null && !isFinishing) {
             if (NetworkHelper.isOnline(this)) {
+                showProgressDialog()
+
                 disposable.add(
                         restInterface.makeRequest(
-                                Request(null, null, desc, null, propertyId, null, null,
-                                        Commons.user!!.id, serviceId, null, null, null, null))
+                                Request(title, desc, propertyId, Commons.user!!.id, date, time, serviceId))
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe({
@@ -113,29 +145,14 @@ class Details : BaseActivity(), View.OnClickListener {
             } else {
                 snackbar(parentLayout, getString(R.string.network_unavailable))
             }
-//           Completable.fromAction({
-//               val request = Request(System.currentTimeMillis(), service, property, desc, date, time)
-//
-//               try {
-//                   realm.executeTransaction {
-//                       realm.copyToRealmOrUpdate(request)
-//                   }
-//               } catch(ex: RealmException){
-//                   Log.e(TAG, ex.localizedMessage, ex)
-//               }
-//
-//               toast("Request has been logged")
-//           }).subscribe({
-//               startActivity(Intent(this, Summary::class.java).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP))
-//               finish()
-//           })
         }
     }
 
     private fun showMessage() {
         if (!isFinishing)
-            alert("Your request has been made. We will notify you shortly") {
+            alert("Your request has been made. We will notify you shortly", "Thank You") {
                 yesButton {
+                    startActivity(intentFor<ServiceChooser>().clearTop())
                     it.dismiss()
                 }
             }.show()
@@ -143,6 +160,16 @@ class Details : BaseActivity(), View.OnClickListener {
 
     private fun isEmpty(text: String?): Boolean {
         return text!!.isBlank() or text.isEmpty()
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        return when (item?.itemId) {
+            android.R.id.home -> {
+                onBackPressed()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     override fun onDestroy() {

@@ -18,15 +18,11 @@ import org.jetbrains.anko.intentFor
  */
 class Splash : AppCompatActivity() {
 
-    lateinit var realm: Realm
-
     override fun onCreate(savedInstanceState: Bundle?) {
         window.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.splash)
-
-        realm = Realm.getInstance(RealmUtil.getRealmConfig())
 
         Glide.with(this).load(R.drawable.splash_image).into(background)
 

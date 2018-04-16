@@ -1,6 +1,5 @@
 package app.android.serv.activity
 
-import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.view.Menu
@@ -10,21 +9,20 @@ import app.android.serv.R
 import app.android.serv.adapter.PropertyResultsAdapter
 import app.android.serv.event.ErrorEvent
 import app.android.serv.model.Property
-import app.android.serv.rest.ErrorHandler
 import app.android.serv.rest.RestClient
 import app.android.serv.rest.RestInterface
-import app.android.serv.util.NetworkHelper
+import app.android.serv.util.RealmUtil
 import app.android.serv.view.DividerItemDecoration
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.schedulers.Schedulers
+import io.realm.Realm
+import io.realm.RealmResults
 import kotlinx.android.synthetic.main.properties.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import org.jetbrains.anko.alert
-import org.jetbrains.anko.design.snackbar
+import org.jetbrains.anko.intentFor
 import org.jetbrains.anko.yesButton
 
 /**
@@ -38,6 +36,10 @@ class Properties : BaseActivity() {
 
     private val restInterface by lazy {
         RestClient.client.create(RestInterface::class.java)
+    }
+
+    private val realm by lazy {
+        Realm.getInstance(RealmUtil.getRealmConfig())
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -67,30 +69,34 @@ class Properties : BaseActivity() {
     }
 
     private fun loadUserProperties() {
-        if (NetworkHelper.isOnline(this)) {
-            if (!isFinishing) {
-                showProgressDialog()
+        val properties = realm.where(Property::class.java).findAll()
 
-                disposable.add(
-                        restInterface.getProperties()
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe({
-                                    hideProgressDialog()
-
-                                    showProperties(it)
-                                }) {
-                                    hideProgressDialog()
-                                    ErrorHandler.showError(it)
-                                }
-                )
-            }
-        } else {
-            snackbar(parentLayout, getString(R.string.network_unavailable))
-        }
+        if (properties.isNotEmpty())
+            showProperties(properties)
+//        if (NetworkHelper.isOnline(this)) {
+//            if (!isFinishing) {
+//                showProgressDialog()
+//
+//                disposable.add(
+//                        restInterface.getProperties()
+//                                .subscribeOn(Schedulers.io())
+//                                .observeOn(AndroidSchedulers.mainThread())
+//                                .subscribe({
+//                                    hideProgressDialog()
+//
+//                                    showProperties(it)
+//                                }) {
+//                                    hideProgressDialog()
+//                                    ErrorHandler.showError(it)
+//                                }
+//                )
+//            }
+//        } else {
+//            snackbar(parentLayout, getString(R.string.network_unavailable))
+//        }
     }
 
-    private fun showProperties(properties: ArrayList<Property>) {
+    private fun showProperties(properties: RealmResults<Property>) {
         val adapter = PropertyResultsAdapter(this, serviceId!!, properties)
         propertiesRecycler.adapter = adapter
     }
@@ -102,7 +108,7 @@ class Properties : BaseActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean = when (item?.itemId) {
         R.id.add -> {
-            startActivity(Intent(this, MapActivity::class.java))
+            startActivity(intentFor<MapActivity>(Constants.SERVICE_ID to serviceId))
             true
         }
         android.R.id.home -> {
@@ -112,13 +118,9 @@ class Properties : BaseActivity() {
         else -> false
     }
 
-    override fun onStart() {
-        super.onStart()
-        EventBus.getDefault().register(this)
-    }
-
-    override fun onStop() {
-        EventBus.getDefault().unregister(this)
-        super.onStop()
+    override fun onDestroy() {
+        super.onDestroy()
+        realm?.close()
+        disposable.clear()
     }
 }

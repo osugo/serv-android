@@ -8,10 +8,10 @@
         android:title="Get Place"
         app:showAsAction="always" />
 
-    <item
-        android:id="@+id/done"
-        android:icon="@drawable/ic_done"
-        android:title="Done"
-        app:showAsAction="always" />
+    <!--<item-->
+        <!--android:id="@+id/done"-->
+        <!--android:icon="@drawable/ic_done"-->
+        <!--android:title="Done"-->
+        <!--app:showAsAction="always" />-->
 
 </menu>

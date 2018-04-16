@@ -2,6 +2,7 @@ package app.android.serv.activity
 
 import android.annotation.SuppressLint
 import android.app.ProgressDialog
+import android.content.Context
 import android.content.DialogInterface
 import android.content.pm.PackageManager
 import android.location.Location
@@ -15,6 +16,7 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
 import android.widget.FrameLayout
 import android.widget.TextView
@@ -51,12 +53,13 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import io.realm.Realm
 import io.realm.RealmList
-import kotlinx.android.synthetic.main.property_selection.*
+import kotlinx.android.synthetic.main.activity_properties.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import org.jetbrains.anko.*
+import org.jetbrains.anko.design.snackbar
 
 class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener, AdapterView.OnItemClickListener {
 
@@ -157,10 +160,10 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
         supportActionBar?.setHomeButtonEnabled(true)
 
         // Construct a GeoDataClient.
-        mGeoDataClient = Places.getGeoDataClient(this, null)
+        mGeoDataClient = Places.getGeoDataClient(this)
 
         // Construct a PlaceDetectionClient.
-        mPlaceDetectionClient = Places.getPlaceDetectionClient(this, null)
+        mPlaceDetectionClient = Places.getPlaceDetectionClient(this)
 
         // Construct a FusedLocationProviderClient.
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
@@ -176,6 +179,11 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
             val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
             mapFragment.getMapAsync(this)
         }, 500)
+
+        done.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_add_location))
+        done.setOnClickListener {
+            showPropertyTypes()
+        }
     }
 
     /**
@@ -229,11 +237,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
      * Saves the state of the map when the activity is paused.
      */
     override fun onSaveInstanceState(outState: Bundle?) {
-        if (map != null) {
-            outState!!.putParcelable(KEY_CAMERA_POSITION, map.cameraPosition)
-            outState.putParcelable(KEY_LOCATION, mLastKnownLocation)
-            super.onSaveInstanceState(outState)
-        }
+        outState!!.putParcelable(KEY_CAMERA_POSITION, map.cameraPosition)
+        outState.putParcelable(KEY_LOCATION, mLastKnownLocation)
+        super.onSaveInstanceState(outState)
     }
 
     /**
@@ -251,23 +257,11 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
 
         location.setText(place.name)
 
+        hideKeyboard()
+
         Log.e(TAG, place.address.toString())
 
         showMarker(place.latLng, place.name.toString(), place.address.toString())
-
-//        // Format details of the place for display and show it in a TextView.
-//        mPlaceDetailsText.setText(formatPlaceDetails(resources, place.name,
-//                place.id, place.address, place.phoneNumber,
-//                place.websiteUri))
-//
-//        // Display the third party attributions if set.
-//        val thirdPartyAttribution = places.attributions
-//        if (thirdPartyAttribution == null) {
-//            mPlaceDetailsAttribution.setVisibility(View.GONE)
-//        } else {
-//            mPlaceDetailsAttribution.setVisibility(View.VISIBLE)
-//            mPlaceDetailsAttribution.setText(Html.fromHtml(thirdPartyAttribution.toString()))
-//        }
 
         Log.i(TAG, "Place details received: " + place.name)
 
@@ -289,9 +283,10 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
                     if (task.isSuccessful) {
                         // Set the map's camera position to the current location of the device.
                         mLastKnownLocation = task.result
-                        map.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                                LatLng(mLastKnownLocation!!.latitude,
-                                        mLastKnownLocation!!.longitude), DEFAULT_ZOOM.toFloat()))
+
+                        mLastKnownLocation?.let {
+                            map.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(it.latitude, it.longitude), DEFAULT_ZOOM.toFloat()))
+                        }
                     } else {
                         Log.d(TAG, "Current location is null. Using defaults.")
                         Log.e(TAG, "Exception: %s", task.exception)
@@ -352,10 +347,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
                 showCurrentPlace()
                 true
             }
-            R.id.done -> {
-                showPropertyTypes()
-                true
-            }
             else -> false
         }
     }
@@ -364,59 +355,74 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
      * Show the list of property types to select from
      */
     private fun showPropertyTypes() {
-        val results = realm.where(PropertyType::class.java).findAll()
+        if (!location.text.isNullOrEmpty()) {
+            val results = realm.where(PropertyType::class.java).findAll()
 
-        if (results.isNotEmpty()) {
-            val list = RealmList<PropertyType>()
-            list.addAll(results)
+            if (results.isNotEmpty()) {
+                val list = RealmList<PropertyType>()
+                list.addAll(results)
 
-            propertyTypes = list
+                propertyTypes = list
 
-            showTypes(results.map { it.name!! })
-        } else if (NetworkHelper.isOnline(this)) {
-            if (!isFinishing) {
-                showProgressDialog()
+                showTypes(results.map { it.name!! })
+            } else if (NetworkHelper.isOnline(this)) {
+                if (!isFinishing) {
+                    showProgressDialog()
 
-                disposable.add(
-                        restInterface.getPropertyTypes()
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe({
-                                    hideProgressDialog()
-                                    propertyTypes = it
-                                    showTypes(it.map { it.name!! })
-                                }) {
-                                    hideProgressDialog()
-                                    ErrorHandler.showError(it)
-                                }
-                )
+                    disposable.add(
+                            restInterface.getPropertyTypes()
+                                    .subscribeOn(Schedulers.io())
+                                    .observeOn(AndroidSchedulers.mainThread())
+                                    .subscribe({
+                                        hideProgressDialog()
+                                        propertyTypes = it
+
+                                        savePropertyTypesToRealm(it)
+                                        showTypes(it.map { it.name!! })
+                                    }) {
+                                        hideProgressDialog()
+                                        ErrorHandler.showError(it)
+                                    }
+                    )
+                }
+            } else {
+                snackbar(parentLayout, getString(R.string.network_unavailable))
             }
         } else {
-            toast(getString(R.string.network_unavailable))
+            snackbar(parentLayout, "Please select a property to proceed")
+        }
+    }
+
+    private fun savePropertyTypesToRealm(propertyTypes: RealmList<PropertyType>) {
+        Realm.getInstance(RealmUtil.getRealmConfig()).use {
+            it.executeTransaction {
+                it.copyToRealmOrUpdate(propertyTypes)
+            }
         }
     }
 
     private fun showTypes(types: List<String>) {
         selector("Property Type", types, { _, i ->
             createProperty(getPropertyTypeId(types[i])!!)
-            Log.e(TAG, "Property type: $propertyType")
         })
     }
 
     private fun createProperty(propertyTypeId: String) {
         if (NetworkHelper.isOnline(this)) {
-            if (!isFinishing) {
+            if (!isFinishing && propertyLocation != null) {
                 showProgressDialog()
 
                 disposable.add(
                         restInterface.createProperty(
-                                Property(null, null, null, propertyTypeId,
-                                        propertyLocation!!.longitude.toString(), propertyLocation!!.longitude.toString(), null, null))
+                                Property(location.text.toString(), null, null, propertyTypeId,
+                                        propertyLocation!!.longitude.toString(), propertyLocation!!.latitude.toString(), null, null))
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe({ property ->
                                     Realm.getInstance(RealmUtil.getRealmConfig()).use {
-                                        it.copyToRealmOrUpdate(property)
+                                        it.executeTransaction {
+                                            it.copyToRealmOrUpdate(property)
+                                        }
                                     }
 
                                     hideProgressDialog()
@@ -429,7 +435,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
                 )
             }
         } else {
-            toast(getString(R.string.network_unavailable))
+            snackbar(parentLayout, getString(R.string.network_unavailable))
         }
     }
 
@@ -449,7 +455,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
     private fun showProgressDialog() {
         dialog = indeterminateProgressDialog("Please wait...")
     }
-
 
     private fun hideProgressDialog() {
         if (dialog != null && dialog!!.isShowing) {
@@ -609,6 +614,15 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
                     it.dismiss()
                 }
             }.show()
+    }
+
+    private fun hideKeyboard() {
+        val view = currentFocus
+
+        view?.let {
+            val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            inputMethodManager.hideSoftInputFromWindow(it.windowToken, 0)
+        }
     }
 
     override fun onDestroy() {

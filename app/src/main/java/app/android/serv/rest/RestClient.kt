@@ -1,5 +1,6 @@
 package app.android.serv.rest
 
+import android.util.Log
 import app.android.serv.util.Commons
 import com.google.gson.ExclusionStrategy
 import com.google.gson.FieldAttributes
@@ -18,6 +19,8 @@ import java.util.concurrent.TimeUnit
 object RestClient {
 
     private const val baseURL = "http://serv.mtandao.space/"
+
+    private val TAG = RestClient::class.java.simpleName
 
     private lateinit var retrofit: Retrofit
     private val tokenAuthenticator = TokenAuthenticator()
@@ -39,6 +42,13 @@ object RestClient {
     val client: Retrofit
         get() {
             dispatcher.maxRequests = 1
+
+            val creds = if (Commons.credentials == null)
+                "Using user object"
+            else
+                "Using stored credentials object"
+
+            Log.e(TAG, creds)
 
             val okClient = OkHttpClient.Builder()
                     .connectTimeout(30, TimeUnit.SECONDS)
@@ -76,7 +86,13 @@ object RestClient {
                     .connectTimeout(30, TimeUnit.SECONDS)
                     .readTimeout(30, TimeUnit.SECONDS)
                     .writeTimeout(30, TimeUnit.SECONDS)
-                    .authenticator(tokenAuthenticator)
+                    .addInterceptor {
+                        val original = it.request()
+
+                        val request = original.newBuilder().header("Content-Type", "application/json").build()
+
+                        it.proceed(request)
+                    }
                     .addInterceptor(loggingInterceptor)
                     .dispatcher(dispatcher)
                     .build()

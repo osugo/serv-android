@@ -620,6 +620,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
         val view = currentFocus
 
         view?.let {
+            Log.e(TAG, "View is not null, hiding keyboard")
+
             val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             inputMethodManager.hideSoftInputFromWindow(it.windowToken, 0)
         }

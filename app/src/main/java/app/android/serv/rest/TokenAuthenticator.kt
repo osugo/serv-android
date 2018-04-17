@@ -1,11 +1,13 @@
 package app.android.serv.rest
 
+import android.util.Log
 import app.android.serv.R
 import app.android.serv.Serv
 import app.android.serv.model.RequestCredentials
 import app.android.serv.model.UserCredentials
 import app.android.serv.util.Commons
 import app.android.serv.util.PrefUtils
+import com.androidnetworking.AndroidNetworking
 import com.google.gson.Gson
 import okhttp3.Authenticator
 import okhttp3.Request
@@ -35,11 +37,17 @@ class TokenAuthenticator : Authenticator {
         val token = if (Commons.credentials == null) Commons.user?.refreshToken else Commons.credentials!!.refreshToken
 
         if (token != null) {
-            val restInterface = RestClient.client.create(RestInterface::class.java)
+
+//            val request = AndroidNetworking.post("http://serv.mtandao.space/oauth/token")
+//                    .addJSONObjectBody()
+            Log.e("Token", token)
+            val restInterface = RestClient.headerLessClient.create(RestInterface::class.java)
 
             val call = restInterface.refreshToken(
-                    RequestCredentials(Serv.INSTANCE.getString(R.string.client_id), Serv.INSTANCE.getString(R.string.client_secret), Commons.credentials!!.refreshToken)
+                    RequestCredentials(Serv.INSTANCE.getString(R.string.client_id), Serv.INSTANCE.getString(R.string.client_secret), token, "refresh_token")
             )
+
+            Log.e("Refresh", "here")
 
             var userCredentials: UserCredentials? = null
 
@@ -49,12 +57,19 @@ class TokenAuthenticator : Authenticator {
                 e.printStackTrace()
             }
 
+            Log.e("Credentials", if (userCredentials == null) "Is null" else "Is not null")
+
             return if (userCredentials != null) {
+                Log.e("Credentials", "Is not null")
                 PrefUtils.putString(PrefUtils.CREDENTIALS, Gson().toJson(userCredentials))
                 userCredentials
-            } else
+            } else {
+                Log.e("Credentials", "Is null")
                 null
-        } else
+            }
+        } else {
+            Log.e("Refresh", "Token is null")
             return null
+        }
     }
 }

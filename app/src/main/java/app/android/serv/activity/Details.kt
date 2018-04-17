@@ -26,6 +26,7 @@ import org.jetbrains.anko.clearTop
 import org.jetbrains.anko.design.snackbar
 import org.jetbrains.anko.intentFor
 import org.jetbrains.anko.yesButton
+import java.text.SimpleDateFormat
 import java.util.*
 
 
@@ -116,12 +117,11 @@ class Details : BaseActivity(), View.OnClickListener {
         }
 
         if (date == null) {
-            snackbar(parentLayout, "Please choose a date")
-            return
+            date = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
         }
 
         if (time == null) {
-            snackbar(parentLayout, "Please choose a time")
+            time = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Calendar.getInstance().time)
         }
 
         if (!isEmpty(desc) && !isEmpty(title) && propertyId != null && date != null && time != null && !isFinishing) {

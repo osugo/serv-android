@@ -7,7 +7,6 @@ import app.android.serv.model.RequestCredentials
 import app.android.serv.model.UserCredentials
 import app.android.serv.util.Commons
 import app.android.serv.util.PrefUtils
-import com.androidnetworking.AndroidNetworking
 import com.google.gson.Gson
 import okhttp3.Authenticator
 import okhttp3.Request

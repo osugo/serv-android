@@ -1,6 +1,8 @@
 package app.android.serv.activity
 
+import android.graphics.Color
 import android.os.Bundle
+import android.support.v4.content.ContextCompat
 import android.view.MenuItem
 import android.view.View
 import app.android.serv.Constants
@@ -21,11 +23,8 @@ import kotlinx.android.synthetic.main.details.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
-import org.jetbrains.anko.alert
-import org.jetbrains.anko.clearTop
+import org.jetbrains.anko.*
 import org.jetbrains.anko.design.snackbar
-import org.jetbrains.anko.intentFor
-import org.jetbrains.anko.yesButton
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -156,6 +155,40 @@ class Details : BaseActivity(), View.OnClickListener {
                     it.dismiss()
                 }
             }.show()
+
+//            alert {
+//                customView {
+//                    linearLayout {
+//                        padding = dip(20)
+//
+//                        relativeLayout {
+//                            backgroundColor = ContextCompat.getColor(this@Details, R.color.BrightOrange)
+//
+//                            textView("Thank You") {
+//                                textColor = Color.WHITE
+//                                textSize = 18f
+//                            }.lparams {
+//                                centerInParent()
+//                            }
+//                        }
+//
+//                        textView("Your request has been made. We will notify you shortly") {
+//                            textColor = Color.BLACK
+//                            textSize = 16f
+//                            padding = dip(20)
+//                        }
+//
+//                        button("Ok") {
+//                            textColor = Color.WHITE
+//                            background = ContextCompat.getDrawable(this@Details, R.drawable.button_background)
+//                        }.lparams(width = matchParent, height = wrapContent)
+//                                .setOnClickListener {
+//                                    startActivity(intentFor<ServiceChooser>().clearTop())
+//                                }
+//                    }
+//
+//                }
+//            }.show()
     }
 
     private fun isEmpty(text: String?): Boolean {

@@ -7,6 +7,7 @@ import app.android.serv.model.RequestCredentials
 import app.android.serv.model.UserCredentials
 import app.android.serv.util.Commons
 import app.android.serv.util.PrefUtils
+import com.androidnetworking.AndroidNetworking
 import com.google.gson.Gson
 import okhttp3.Authenticator
 import okhttp3.Request
@@ -37,24 +38,31 @@ class TokenAuthenticator : Authenticator {
 
         if (token != null) {
 
-//            val request = AndroidNetworking.post("http://serv.mtandao.space/oauth/token")
-//                    .addJSONObjectBody()
             Log.e("Token", token)
-            val restInterface = RestClient.headerLessClient.create(RestInterface::class.java)
+//            val restInterface = RestClient.headerLessClient.create(RestInterface::class.java)
+//
+//            val call = restInterface.refreshToken(
+//                    RequestCredentials(Serv.INSTANCE.getString(R.string.client_id), Serv.INSTANCE.getString(R.string.client_secret), token, "refresh_token")
+//            )
 
-            val call = restInterface.refreshToken(
-                    RequestCredentials(Serv.INSTANCE.getString(R.string.client_id), Serv.INSTANCE.getString(R.string.client_secret), token, "refresh_token")
-            )
+            val request = AndroidNetworking.post("http://serv.mtandao.space/oauth/token")
+                    .addBodyParameter(RequestCredentials(Serv.INSTANCE.getString(R.string.client_id), Serv.INSTANCE.getString(R.string.client_secret), token, "refresh_token"))
+                    .build()
 
             Log.e("Refresh", "here")
 
+            val response = request.executeForObject(UserCredentials::class.java)
+
             var userCredentials: UserCredentials? = null
 
-            try {
-                userCredentials = call.execute().body()
-            } catch (e: IOException) {
-                e.printStackTrace()
-            }
+            if (response.isSuccess)
+                userCredentials = response.result as UserCredentials
+//
+//            try {
+//                userCredentials = request.executeForObject(UserCredentials::class.java)
+//            } catch (e: IOException) {
+//                e.printStackTrace()
+//            }
 
             Log.e("Credentials", if (userCredentials == null) "Is null" else "Is not null")
 

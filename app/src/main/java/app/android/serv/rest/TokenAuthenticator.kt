@@ -1,11 +1,13 @@
 package app.android.serv.rest
 
+import android.util.Log
 import app.android.serv.R
 import app.android.serv.Serv
 import app.android.serv.model.RequestCredentials
 import app.android.serv.model.UserCredentials
 import app.android.serv.util.Commons
 import app.android.serv.util.PrefUtils
+import com.androidnetworking.AndroidNetworking
 import com.google.gson.Gson
 import okhttp3.Authenticator
 import okhttp3.Request
@@ -35,26 +37,25 @@ class TokenAuthenticator : Authenticator {
         val token = if (Commons.credentials == null) Commons.user?.refreshToken else Commons.credentials!!.refreshToken
 
         if (token != null) {
-            val restInterface = RestClient.client.create(RestInterface::class.java)
+            val request = AndroidNetworking.post("http://serv.mtandao.space/oauth/token")
+                    .addBodyParameter(RequestCredentials(Serv.INSTANCE.getString(R.string.client_id), Serv.INSTANCE.getString(R.string.client_secret), token, "refresh_token"))
+                    .build()
 
-            val call = restInterface.refreshToken(
-                    RequestCredentials(Serv.INSTANCE.getString(R.string.client_id), Serv.INSTANCE.getString(R.string.client_secret), Commons.credentials!!.refreshToken)
-            )
+            val response = request.executeForObject(UserCredentials::class.java)
 
             var userCredentials: UserCredentials? = null
 
-            try {
-                userCredentials = call.execute().body()
-            } catch (e: IOException) {
-                e.printStackTrace()
-            }
+            if (response.isSuccess)
+                userCredentials = response.result as UserCredentials
 
             return if (userCredentials != null) {
                 PrefUtils.putString(PrefUtils.CREDENTIALS, Gson().toJson(userCredentials))
                 userCredentials
-            } else
+            } else {
                 null
-        } else
+            }
+        } else {
             return null
+        }
     }
 }

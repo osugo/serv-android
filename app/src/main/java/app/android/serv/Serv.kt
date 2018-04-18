@@ -1,8 +1,8 @@
 package app.android.serv
 
 import android.support.multidex.MultiDexApplication
-import app.android.serv.model.User
 import app.android.serv.util.RealmUtil
+import com.androidnetworking.AndroidNetworking
 import com.crashlytics.android.Crashlytics
 import com.crashlytics.android.answers.Answers
 import com.facebook.FacebookSdk
@@ -13,7 +13,7 @@ import io.realm.Realm
 /**
  * Created by kombo on 28/03/2018.
  */
-class Serv: MultiDexApplication() {
+class Serv : MultiDexApplication() {
 
     companion object {
         lateinit var INSTANCE: Serv
@@ -34,5 +34,7 @@ class Serv: MultiDexApplication() {
 
         Fabric.with(this, Crashlytics(), Answers())
 //        Fabric.with(this, Answers())
+
+        AndroidNetworking.initialize(applicationContext)
     }
 }

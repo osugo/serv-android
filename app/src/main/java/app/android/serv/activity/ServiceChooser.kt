@@ -56,7 +56,7 @@ class ServiceChooser : BaseActivity() {
                 yesButton {
                     it.dismiss()
                 }
-            }
+            }.show()
         }
     }
 

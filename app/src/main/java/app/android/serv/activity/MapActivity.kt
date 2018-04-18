@@ -180,7 +180,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
             mapFragment.getMapAsync(this)
         }, 500)
 
-        done.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_add_location))
+        done.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_done))
         done.setOnClickListener {
             showPropertyTypes()
         }
@@ -619,10 +619,12 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
     private fun hideKeyboard() {
         val view = currentFocus
 
-        view?.let {
+//        view?.let {
+//            Log.e(TAG, "View is not null, hiding keyboard")
+
             val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            inputMethodManager.hideSoftInputFromWindow(it.windowToken, 0)
-        }
+            inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
+//        }
     }
 
     override fun onDestroy() {

@@ -94,11 +94,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
     private lateinit var googleApiClient: GoogleApiClient
     private lateinit var adapter: PlaceAutocompleteAdapter
 
-    private var property: Property? = null
-
     private var name: String? = null
     private var propertyLocation: LatLng? = null
-    private var propertyType: String? = null
     private var serviceId: String? = null
     private var dialog: ProgressDialog? = null
     private var propertyTypes: RealmList<PropertyType>? = null
@@ -256,6 +253,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
         val place = places.get(0)
 
         location.setText(place.name)
+        location.dismissDropDown()
 
         hideKeyboard()
 
@@ -345,6 +343,10 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
         return when (item?.itemId) {
             R.id.pick_place -> {
                 showCurrentPlace()
+                true
+            }
+            android.R.id.home -> {
+                onBackPressed()
                 true
             }
             else -> false
@@ -619,12 +621,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
     private fun hideKeyboard() {
         val view = currentFocus
 
-//        view?.let {
-//            Log.e(TAG, "View is not null, hiding keyboard")
-
-            val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
-//        }
+        val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
     override fun onDestroy() {

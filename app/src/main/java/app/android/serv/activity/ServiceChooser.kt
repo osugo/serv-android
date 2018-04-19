@@ -34,6 +34,7 @@ import org.jetbrains.anko.yesButton
 class ServiceChooser : BaseActivity() {
 
     private var servicesAdapter: ServicesAdapter? = null
+    private var serviceList: RealmList<Service>? = null
 
     private val icons = intArrayOf(
             R.drawable.light_bulb,
@@ -85,16 +86,22 @@ class ServiceChooser : BaseActivity() {
 
     private fun getServices() {
         Completable.fromAction({
+            showProgressDialog()
             val services = realm.where(Service::class.java).findAll()
 
-            if(services.isNotEmpty()){
+            if (services.isNotEmpty()) {
                 val items = RealmList<Service>()
-                items.addAll(services)
+                items.addAll(realm.copyFromRealm(services))
+
+                serviceList = items
+
+                hideProgressDialog()
                 showServices(items)
             }
         }).subscribe({
             if (NetworkHelper.isOnline(this)) {
-                showProgressDialog()
+                if (serviceList == null)
+                    showProgressDialog()
 
                 disposable.add(
                         restInterface.getServices()
@@ -134,14 +141,14 @@ class ServiceChooser : BaseActivity() {
         }
     }
 
-    private fun saveServicesToRealm(services: RealmList<Service>){
+    private fun saveServicesToRealm(services: RealmList<Service>) {
         try {
             Realm.getInstance(RealmUtil.getRealmConfig()).use {
-                it.executeTransaction{
+                it.executeTransaction {
                     it.copyToRealmOrUpdate(services)
                 }
             }
-        } catch (e: RealmException){
+        } catch (e: RealmException) {
             Log.e(TAG, e.localizedMessage, e)
         }
     }

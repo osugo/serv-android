@@ -16,14 +16,23 @@ import app.android.serv.model.Service
 import app.android.serv.util.RealmUtil
 import app.android.serv.view.SquareImageView
 import io.realm.Realm
+import io.realm.RealmList
 import org.jetbrains.anko.find
 import org.jetbrains.anko.intentFor
 
 /**
  * Created by kombo on 07/10/2017.
  */
-class ServicesAdapter(private val context: Context, private val services: ArrayList<Service>)
-    : RecyclerView.Adapter<ServicesAdapter.ViewHolder>() {
+class ServicesAdapter(private val context: Context) : RecyclerView.Adapter<ServicesAdapter.ViewHolder>() {
+
+    private var services: RealmList<Service>? = null
+
+    fun setData(items: RealmList<Service>?) {
+        items?.let {
+            services?.clear()
+            services?.addAll(items)
+        }
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.service_selection, parent, false)
@@ -31,10 +40,10 @@ class ServicesAdapter(private val context: Context, private val services: ArrayL
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bindItems(context, services[holder.adapterPosition])
+        holder.bindItems(context, services!![holder.adapterPosition]!!)
     }
 
-    override fun getItemCount(): Int = services.size
+    override fun getItemCount(): Int = services?.size ?: 0
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
@@ -58,5 +67,9 @@ class ServicesAdapter(private val context: Context, private val services: ArrayL
                 }
             }
         }
+    }
+
+    init {
+        services = RealmList()
     }
 }

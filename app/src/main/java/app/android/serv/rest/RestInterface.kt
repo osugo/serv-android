@@ -18,7 +18,7 @@ interface RestInterface {
     fun signInWithGoogle(@Body clientCredentials: ClientCredentials): Observable<User>
 
     @GET("services")
-    fun getServices(): Observable<ArrayList<Service>>
+    fun getServices(): Observable<RealmList<Service>>
 
     @POST("oauth/token")
     fun refreshToken(@Body requestCredentials: RequestCredentials): Call<UserCredentials>

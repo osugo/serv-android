@@ -124,7 +124,7 @@ class ServiceChooser : BaseActivity() {
             services.forEach {
                 when (it.name) {
                     "Electrical" -> it.icon = icons[0]
-                    "List Maintenance" -> it.icon = icons[1]
+                    "Lift Maintenance" -> it.icon = icons[1]
                     "Plumbing" -> it.icon = icons[2]
                     "Fumigation" -> it.icon = icons[3]
                     "AC Maintenance" -> it.icon = icons[4]

@@ -39,7 +39,7 @@ class Properties : BaseActivity() {
     }
 
     private val realm by lazy {
-        Realm.getInstance(RealmUtil.getRealmConfig())
+        Realm.getInstance(RealmUtil.realmConfig)
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

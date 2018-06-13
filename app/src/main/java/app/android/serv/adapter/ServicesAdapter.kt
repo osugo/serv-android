@@ -59,7 +59,7 @@ class ServicesAdapter(private val context: Context) : RecyclerView.Adapter<Servi
             }
 
             background.setOnClickListener {
-                Realm.getInstance(RealmUtil.getRealmConfig()).use {
+                Realm.getInstance(RealmUtil.realmConfig).use {
                     if (it.where(Property::class.java).findAll().isNotEmpty())
                         context.startActivity(context.intentFor<Properties>(Constants.SERVICE_ID to service.id))
                     else

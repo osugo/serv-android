@@ -94,38 +94,6 @@ class ServiceChooser : BaseActivity() {
                 }
             }.show()
         }
-//
-//        Completable.fromAction({
-//            showProgressDialog()
-//            val services = realm.where(Service::class.java).findAll()
-//
-//            if (services.isNotEmpty()) {
-//                val items = RealmList<Service>()
-//                items.addAll(realm.copyFromRealm(services))
-//
-//                serviceList = items
-//
-//                hideProgressDialog()
-//                showServices(items)
-//            }
-//        }).subscribe({
-//            if (NetworkHelper.isOnline(this)) {
-//                if (serviceList == null)
-//                    showProgressDialog()
-//
-//                disposable.add(
-//                        restInterface.getServices()
-//                                .subscribeOn(Schedulers.io())
-//                                .observeOn(AndroidSchedulers.mainThread())
-//                                .subscribe({
-//                                    hideProgressDialog()
-//                                    showServices(it)
-//                                }) {
-//                                    ErrorHandler.showError(it)
-//                                }
-//                )
-//            }
-//        })
     }
 
     private fun showServices(services: RealmList<Service>) {
@@ -165,7 +133,7 @@ class ServiceChooser : BaseActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean = when (item?.itemId) {
         android.R.id.home -> {
-            onBackPressed()
+            System.exit(0)
             true
         }
         else -> false

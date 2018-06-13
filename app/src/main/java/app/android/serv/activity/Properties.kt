@@ -34,10 +34,6 @@ class Properties : BaseActivity() {
 
     private val disposable = CompositeDisposable()
 
-    private val restInterface by lazy {
-        RestClient.client.create(RestInterface::class.java)
-    }
-
     private val realm by lazy {
         Realm.getInstance(RealmUtil.realmConfig)
     }
@@ -79,7 +75,7 @@ class Properties : BaseActivity() {
     }
 
     private fun showProperties(properties: RealmResults<Property>) {
-        val adapter = PropertyResultsAdapter(this, serviceId!!, properties)
+        val adapter = PropertyResultsAdapter(this, serviceId!!, properties, true, true)
         propertiesRecycler.adapter = adapter
     }
 

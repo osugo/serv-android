@@ -3,15 +3,10 @@ package app.android.serv.activity
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.LinearLayoutManager
 import android.view.MenuItem
 import app.android.serv.R
-import app.android.serv.adapter.RequestsAdapter
-import app.android.serv.model.Request
 import app.android.serv.util.RealmUtil
-import app.android.serv.view.DividerItemDecoration
 import io.realm.Realm
-import kotlinx.android.synthetic.main.requests.*
 import kotlinx.android.synthetic.main.toolbar.*
 
 /**

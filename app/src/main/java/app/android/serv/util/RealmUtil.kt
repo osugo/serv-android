@@ -7,11 +7,10 @@ import io.realm.RealmConfiguration
  */
 object RealmUtil {
 
-    fun getRealmConfig(): RealmConfiguration {
-        return RealmConfiguration.Builder()
+    val realmConfig: RealmConfiguration
+        get() = RealmConfiguration.Builder()
                 .name("House")
                 .schemaVersion(2)
                 .deleteRealmIfMigrationNeeded()
                 .build()
-    }
 }

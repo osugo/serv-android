@@ -1,5 +1,7 @@
 package app.android.serv.activity
 
+import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
 import android.util.Log
@@ -8,16 +10,12 @@ import app.android.serv.R
 import app.android.serv.adapter.ServicesAdapter
 import app.android.serv.event.ErrorEvent
 import app.android.serv.model.Service
-import app.android.serv.rest.ErrorHandler
-import app.android.serv.rest.RestClient
-import app.android.serv.rest.RestInterface
 import app.android.serv.util.NetworkHelper
 import app.android.serv.util.RealmUtil
 import app.android.serv.view.GridItemDecoration
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.schedulers.Schedulers
+import app.android.serv.viewmodel.ServicesViewModel
 import io.realm.Realm
+import io.realm.RealmList
 import io.realm.exceptions.RealmException
 import kotlinx.android.synthetic.main.service_selection_layout.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -31,6 +29,8 @@ import org.jetbrains.anko.yesButton
  */
 class ServiceChooser : BaseActivity() {
 
+    private var servicesAdapter: ServicesAdapter? = null
+
     private val icons = intArrayOf(
             R.drawable.light_bulb,
             R.drawable.elevator,
@@ -41,10 +41,9 @@ class ServiceChooser : BaseActivity() {
             R.drawable.handyman,
             R.drawable.landscaping
     )
-    private val disposable = CompositeDisposable()
 
-    private val restInterface by lazy {
-        RestClient.client.create(RestInterface::class.java)
+    private val realm by lazy {
+        Realm.getInstance(RealmUtil.realmConfig)
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -66,6 +65,9 @@ class ServiceChooser : BaseActivity() {
 
         setSupportActionBar(toolbar)
 
+        servicesAdapter = ServicesAdapter(this)
+        categories.adapter = servicesAdapter
+
         getServices()
 
         categories.layoutManager = GridLayoutManager(this, 2)
@@ -73,30 +75,66 @@ class ServiceChooser : BaseActivity() {
     }
 
     private fun getServices() {
-        if (NetworkHelper.isOnline(this)) {
-            showProgressDialog()
+        showProgressDialog()
 
-            disposable.add(
-                    restInterface.getServices()
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe({
-                                hideProgressDialog()
-                                showServices(it)
-                            }) {
-                                ErrorHandler.showError(it)
-                            }
-            )
+        if (NetworkHelper.isOnline(this)) {
+            val servicesViewModel = ViewModelProviders.of(this).get(ServicesViewModel::class.java)
+            servicesViewModel.getServices().observe(this, Observer {
+                it?.let {
+                    hideProgressDialog()
+                    showServices(it)
+                }
+            })
+        } else {
+            hideProgressDialog()
+
+            alert("Network connection unavailable") {
+                yesButton {
+                    it.dismiss()
+                }
+            }.show()
         }
+//
+//        Completable.fromAction({
+//            showProgressDialog()
+//            val services = realm.where(Service::class.java).findAll()
+//
+//            if (services.isNotEmpty()) {
+//                val items = RealmList<Service>()
+//                items.addAll(realm.copyFromRealm(services))
+//
+//                serviceList = items
+//
+//                hideProgressDialog()
+//                showServices(items)
+//            }
+//        }).subscribe({
+//            if (NetworkHelper.isOnline(this)) {
+//                if (serviceList == null)
+//                    showProgressDialog()
+//
+//                disposable.add(
+//                        restInterface.getServices()
+//                                .subscribeOn(Schedulers.io())
+//                                .observeOn(AndroidSchedulers.mainThread())
+//                                .subscribe({
+//                                    hideProgressDialog()
+//                                    showServices(it)
+//                                }) {
+//                                    ErrorHandler.showError(it)
+//                                }
+//                )
+//            }
+//        })
     }
 
-    private fun showServices(services: ArrayList<Service>) {
+    private fun showServices(services: RealmList<Service>) {
 
         if (services.isNotEmpty()) {
             services.forEach {
                 when (it.name) {
                     "Electrical" -> it.icon = icons[0]
-                    "List Maintenance" -> it.icon = icons[1]
+                    "Lift Maintenance" -> it.icon = icons[1]
                     "Plumbing" -> it.icon = icons[2]
                     "Fumigation" -> it.icon = icons[3]
                     "AC Maintenance" -> it.icon = icons[4]
@@ -108,19 +146,19 @@ class ServiceChooser : BaseActivity() {
 
             saveServicesToRealm(services)
 
-            val adapter = ServicesAdapter(this, services)
-            categories.adapter = adapter
+            servicesAdapter?.setData(services)
+            servicesAdapter?.notifyDataSetChanged()
         }
     }
 
-    private fun saveServicesToRealm(services: ArrayList<Service>){
+    private fun saveServicesToRealm(services: RealmList<Service>) {
         try {
-            Realm.getInstance(RealmUtil.getRealmConfig()).use {
-                it.executeTransaction{
+            Realm.getInstance(RealmUtil.realmConfig).use {
+                it.executeTransaction {
                     it.copyToRealmOrUpdate(services)
                 }
             }
-        } catch (e: RealmException){
+        } catch (e: RealmException) {
             Log.e(TAG, e.localizedMessage, e)
         }
     }
@@ -136,7 +174,8 @@ class ServiceChooser : BaseActivity() {
     override fun onDestroy() {
         super.onDestroy()
         hideProgressDialog()
-        disposable.clear()
+
+        realm?.close()
     }
 
     companion object {

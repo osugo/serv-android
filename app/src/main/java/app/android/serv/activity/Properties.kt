@@ -39,7 +39,7 @@ class Properties : BaseActivity() {
     }
 
     private val realm by lazy {
-        Realm.getInstance(RealmUtil.getRealmConfig())
+        Realm.getInstance(RealmUtil.realmConfig)
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -65,6 +65,9 @@ class Properties : BaseActivity() {
         propertiesRecycler.layoutManager = LinearLayoutManager(this)
         propertiesRecycler.addItemDecoration(DividerItemDecoration(this))
 
+        addProperty.setImageResource(R.drawable.ic_add)
+        addProperty.setOnClickListener { startActivity(intentFor<MapActivity>(Constants.SERVICE_ID to serviceId)) }
+
         loadUserProperties()
     }
 
@@ -73,27 +76,6 @@ class Properties : BaseActivity() {
 
         if (properties.isNotEmpty())
             showProperties(properties)
-//        if (NetworkHelper.isOnline(this)) {
-//            if (!isFinishing) {
-//                showProgressDialog()
-//
-//                disposable.add(
-//                        restInterface.getProperties()
-//                                .subscribeOn(Schedulers.io())
-//                                .observeOn(AndroidSchedulers.mainThread())
-//                                .subscribe({
-//                                    hideProgressDialog()
-//
-//                                    showProperties(it)
-//                                }) {
-//                                    hideProgressDialog()
-//                                    ErrorHandler.showError(it)
-//                                }
-//                )
-//            }
-//        } else {
-//            snackbar(parentLayout, getString(R.string.network_unavailable))
-//        }
     }
 
     private fun showProperties(properties: RealmResults<Property>) {
@@ -101,16 +83,7 @@ class Properties : BaseActivity() {
         propertiesRecycler.adapter = adapter
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_properties, menu)
-        return true
-    }
-
     override fun onOptionsItemSelected(item: MenuItem?): Boolean = when (item?.itemId) {
-        R.id.add -> {
-            startActivity(intentFor<MapActivity>(Constants.SERVICE_ID to serviceId))
-            true
-        }
         android.R.id.home -> {
             onBackPressed()
             true

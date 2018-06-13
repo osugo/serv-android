@@ -36,10 +36,7 @@ import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.common.api.ResultCallback
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.places.GeoDataClient
-import com.google.android.gms.location.places.PlaceBuffer
-import com.google.android.gms.location.places.PlaceDetectionClient
-import com.google.android.gms.location.places.Places
+import com.google.android.gms.location.places.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -94,19 +91,18 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
     private lateinit var googleApiClient: GoogleApiClient
     private lateinit var adapter: PlaceAutocompleteAdapter
 
-    private var property: Property? = null
-
     private var name: String? = null
     private var propertyLocation: LatLng? = null
-    private var propertyType: String? = null
     private var serviceId: String? = null
     private var dialog: ProgressDialog? = null
     private var propertyTypes: RealmList<PropertyType>? = null
 
+    private val autocomplteteFilter = AutocompleteFilter.Builder().setTypeFilter(Place.TYPE_COUNTRY).setCountry("KE").build()
+
     private val disposable = CompositeDisposable()
 
     private val realm by lazy {
-        Realm.getInstance(RealmUtil.getRealmConfig())
+        Realm.getInstance(RealmUtil.realmConfig)
     }
 
     private val restInterface by lazy {
@@ -195,7 +191,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
      */
-    override fun onMapReady(googleMap: GoogleMap) {
+    override
+
+    fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
 
         // Use a custom info window adapter to handle multiple lines of text in the
@@ -256,6 +254,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
         val place = places.get(0)
 
         location.setText(place.name)
+        location.dismissDropDown()
 
         hideKeyboard()
 
@@ -347,6 +346,10 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
                 showCurrentPlace()
                 true
             }
+            android.R.id.home -> {
+                onBackPressed()
+                true
+            }
             else -> false
         }
     }
@@ -394,7 +397,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
     }
 
     private fun savePropertyTypesToRealm(propertyTypes: RealmList<PropertyType>) {
-        Realm.getInstance(RealmUtil.getRealmConfig()).use {
+        Realm.getInstance(RealmUtil.realmConfig).use {
             it.executeTransaction {
                 it.copyToRealmOrUpdate(propertyTypes)
             }
@@ -419,7 +422,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe({ property ->
-                                    Realm.getInstance(RealmUtil.getRealmConfig()).use {
+                                    Realm.getInstance(RealmUtil.realmConfig).use {
                                         it.executeTransaction {
                                             it.copyToRealmOrUpdate(property)
                                         }
@@ -442,7 +445,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
     private fun getPropertyTypeId(name: String): String? {
         var id: String? = null
 
-        Realm.getInstance(RealmUtil.getRealmConfig()).use {
+        Realm.getInstance(RealmUtil.realmConfig).use {
             val result = it.where(PropertyType::class.java).equalTo("name", name).findFirst()
 
             if (result != null)
@@ -619,12 +622,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
     private fun hideKeyboard() {
         val view = currentFocus
 
-//        view?.let {
-//            Log.e(TAG, "View is not null, hiding keyboard")
-
-            val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
-//        }
+        val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
     override fun onDestroy() {

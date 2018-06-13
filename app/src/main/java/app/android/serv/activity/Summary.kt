@@ -25,7 +25,7 @@ class Summary : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.requests)
 
-        realm = Realm.getInstance(RealmUtil.getRealmConfig())
+        realm = Realm.getInstance(RealmUtil.realmConfig)
 
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)

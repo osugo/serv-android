@@ -17,23 +17,24 @@ class Serv : MultiDexApplication() {
 
     companion object {
         lateinit var INSTANCE: Serv
-    }
-
-    init {
-        INSTANCE = this
+            private set
     }
 
     override fun onCreate() {
         super.onCreate()
 
+        INSTANCE = this
+
         FacebookSdk.sdkInitialize(applicationContext)
         AppEventsLogger.activateApp(this)
 
         Realm.init(this)
-        Realm.setDefaultConfiguration(RealmUtil.getRealmConfig())
+        Realm.setDefaultConfiguration(RealmUtil.realmConfig)
 
-        Fabric.with(this, Crashlytics(), Answers())
-//        Fabric.with(this, Answers())
+        if (BuildConfig.DEBUG)
+            Fabric.with(this, Answers())
+        else
+            Fabric.with(this, Crashlytics(), Answers())
 
         AndroidNetworking.initialize(applicationContext)
     }

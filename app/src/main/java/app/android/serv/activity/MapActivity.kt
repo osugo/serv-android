@@ -187,6 +187,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
 
     private fun setUpAutoCompleteFragment() {
         val autoCompleteFragment = fragmentManager.findFragmentById(R.id.places_autocomplete_fragment) as PlaceAutocompleteFragment
+        autoCompleteFragment.setFilter(autocomplteteFilter)
         autoCompleteFragment.setOnPlaceSelectedListener(object : PlaceSelectionListener {
             override fun onPlaceSelected(place: Place?) {
                 hideKeyboard()

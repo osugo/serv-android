@@ -21,6 +21,7 @@ import android.widget.FrameLayout
 import android.widget.TextView
 import app.android.serv.Constants
 import app.android.serv.R
+
 import app.android.serv.event.ErrorEvent
 import app.android.serv.model.Property
 import app.android.serv.model.PropertyType
@@ -31,7 +32,6 @@ import app.android.serv.util.NetworkHelper
 import app.android.serv.util.RealmUtil
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
-import com.google.android.gms.common.api.ResultCallback
 import com.google.android.gms.common.api.Status
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices

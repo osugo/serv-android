@@ -1,0 +1,47 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+# Uncomment the line if you want fastlane to automatically update itself
+update_fastlane
+
+default_platform(:android)
+
+platform :android do
+  desc "Runs all the tests"
+  lane :test do
+    gradle(task: "test")
+  end
+
+  desc "Submit a new Beta Build to Crashlytics Beta"
+  lane :beta do
+    gradle(
+            task: 'clean assembleRelease',
+            build_type: 'Release'
+          )
+    crashlytics(
+            api_token: '069fc5277125b94ad2d9806c7015774e75bfec79',
+            build_secret: '9499854d113fb05104d05a2b3a22ffe983922c5d7ba3ad205bc9ece3298a6b56',
+            notes: 'updates maps, limits search area to Kenya, fixes back navigation, adds ability to remove added properties, bug fixes and performance improvements',
+            groups: 'reviewers',
+            notifications: 'true'
+          )
+  
+    # sh "your_script.sh"
+    # You can also use other beta testing services here
+  end
+
+  desc "Deploy a new version to the Google Play"
+  lane :deploy do
+    gradle(task: "clean assembleRelease")
+    upload_to_play_store
+  end
+end

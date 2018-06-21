@@ -17,12 +17,10 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import android.widget.AdapterView
 import android.widget.FrameLayout
 import android.widget.TextView
 import app.android.serv.Constants
 import app.android.serv.R
-import app.android.serv.adapter.PlaceAutocompleteAdapter
 import app.android.serv.event.ErrorEvent
 import app.android.serv.model.Property
 import app.android.serv.model.PropertyType
@@ -34,9 +32,12 @@ import app.android.serv.util.RealmUtil
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.common.api.ResultCallback
+import com.google.android.gms.common.api.Status
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.places.*
+import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment
+import com.google.android.gms.location.places.ui.PlaceSelectionListener
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -58,7 +59,7 @@ import org.greenrobot.eventbus.ThreadMode
 import org.jetbrains.anko.*
 import org.jetbrains.anko.design.snackbar
 
-class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener, AdapterView.OnItemClickListener {
+class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener {
 
     private lateinit var map: GoogleMap
 
@@ -89,7 +90,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
 
     // Obtain a client for use with Places API
     private lateinit var googleApiClient: GoogleApiClient
-    private lateinit var adapter: PlaceAutocompleteAdapter
+//    private lateinit var adapter: PlaceAutocompleteAdapter
 
     private var name: String? = null
     private var propertyLocation: LatLng? = null
@@ -117,22 +118,22 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
         val BOUNDS_GREATER_SYDNEY = LatLngBounds(LatLng(-34.041458, 150.790100), LatLng(-33.682247, 151.383362));
     }
 
-    override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-        val item = adapter.getItem(position)
-        val placeId = item.placeId
-        val primaryText = item.getPrimaryText(null)
-
-        Log.i(TAG, "Autocomplete item selected: $primaryText")
-
-        /*
-             Issue a request to the Places Geo Data API to retrieve a Place object with additional
-             details about the place.
-              */
-        val placeResult = Places.GeoDataApi.getPlaceById(googleApiClient, placeId)
-        placeResult.setResultCallback(updatePlaceDetailsCallback)
-
-        Log.i(TAG, "Called getPlaceById to get Place details for " + placeId!!)
-    }
+//    override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+//        val item = adapter.getItem(position)
+//        val placeId = item.placeId
+//        val primaryText = item.getPrimaryText(null)
+//
+//        Log.i(TAG, "Autocomplete item selected: $primaryText")
+//
+//        /*
+//             Issue a request to the Places Geo Data API to retrieve a Place object with additional
+//             details about the place.
+//              */
+//        val placeResult = Places.GeoDataApi.getPlaceById(googleApiClient, placeId)
+//        placeResult.setResultCallback(updatePlaceDetailsCallback)
+//
+//        Log.i(TAG, "Called getPlaceById to get Place details for " + placeId!!)
+//    }
 
     override fun onConnectionFailed(connectionResult: ConnectionResult) {
         //do nothing, connection failed
@@ -164,10 +165,10 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
         // Construct a FusedLocationProviderClient.
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
 
-        location.onItemClickListener = this
+//        location.onItemClickListener = this
 
-        adapter = PlaceAutocompleteAdapter(this, googleApiClient, BOUNDS_GREATER_SYDNEY, null)
-        location.setAdapter(adapter)
+//        adapter = PlaceAutocompleteAdapter(this, googleApiClient, BOUNDS_GREATER_SYDNEY, null)
+//        location.setAdapter(adapter)
 
         //add a 500ms delay to prevent the activity from freezing up before the map loads
         Handler().postDelayed({
@@ -180,6 +181,30 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
         done.setOnClickListener {
             showPropertyTypes()
         }
+
+        setUpAutoCompleteFragment()
+    }
+
+    private fun setUpAutoCompleteFragment() {
+        val autoCompleteFragment = fragmentManager.findFragmentById(R.id.places_autocomplete_fragment) as PlaceAutocompleteFragment
+        autoCompleteFragment.setOnPlaceSelectedListener(object : PlaceSelectionListener {
+            override fun onPlaceSelected(place: Place?) {
+                hideKeyboard()
+
+                place?.let {
+                    Log.e(TAG, it.address.toString())
+
+                    showMarker(it.latLng, it.name.toString(), it.address.toString())
+
+                    Log.i(TAG, "Place details received: ${it.name}")
+                }
+
+            }
+
+            override fun onError(status: Status?) {
+                toast("An error occurred $status")
+            }
+        })
     }
 
     /**
@@ -191,9 +216,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
      */
-    override
-
-    fun onMapReady(googleMap: GoogleMap) {
+    override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
 
         // Use a custom info window adapter to handle multiple lines of text in the
@@ -240,32 +263,32 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
         super.onSaveInstanceState(outState)
     }
 
-    /**
-     * Callback for results from a Places Geo Data API query that shows the first place result in
-     * the details view on screen.
-     */
-    private val updatePlaceDetailsCallback = ResultCallback<PlaceBuffer> { places ->
-        if (!places.status.isSuccess) {
-            Log.e(TAG, "Place query did not complete. Error: " + places.status.toString())
-            places.release()
-            return@ResultCallback
-        }
-
-        val place = places.get(0)
-
-        location.setText(place.name)
-        location.dismissDropDown()
-
-        hideKeyboard()
-
-        Log.e(TAG, place.address.toString())
-
-        showMarker(place.latLng, place.name.toString(), place.address.toString())
-
-        Log.i(TAG, "Place details received: " + place.name)
-
-        places.release()
-    }
+//    /**
+//     * Callback for results from a Places Geo Data API query that shows the first place result in
+//     * the details view on screen.
+//     */
+//    private val updatePlaceDetailsCallback = ResultCallback<PlaceBuffer> { places ->
+//        if (!places.status.isSuccess) {
+//            Log.e(TAG, "Place query did not complete. Error: " + places.status.toString())
+//            places.release()
+//            return@ResultCallback
+//        }
+//
+//        val place = places.get(0)
+//
+////        location.setText(place.name)
+////        location.dismissDropDown()
+//
+//        hideKeyboard()
+//
+//        Log.e(TAG, place.address.toString())
+//
+//        showMarker(place.latLng, place.name.toString(), place.address.toString())
+//
+//        Log.i(TAG, "Place details received: " + place.name)
+//
+//        places.release()
+//    }
 
     /**
      * Gets the current location of the device, and positions the map's camera.
@@ -358,7 +381,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
      * Show the list of property types to select from
      */
     private fun showPropertyTypes() {
-        if (!location.text.isNullOrEmpty()) {
+        if (!name.isNullOrEmpty()) {
             val results = realm.where(PropertyType::class.java).findAll()
 
             if (results.isNotEmpty()) {
@@ -405,9 +428,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
     }
 
     private fun showTypes(types: List<String>) {
-        selector("Property Type", types, { _, i ->
+        selector("Property Type", types) { _, i ->
             createProperty(getPropertyTypeId(types[i])!!)
-        })
+        }
     }
 
     private fun createProperty(propertyTypeId: String) {
@@ -417,7 +440,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
 
                 disposable.add(
                         restInterface.createProperty(
-                                Property(location.text.toString(), null, null, propertyTypeId,
+                                Property(name.toString(), null, null, propertyTypeId,
                                         propertyLocation!!.longitude.toString(), propertyLocation!!.latitude.toString(), null, null))
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
@@ -488,10 +511,10 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
                     }
 
                     var i = 0
-                    mLikelyPlaceNames = Array(count, { "" })
-                    mLikelyPlaceAddresses = Array(count, { "" })
-                    mLikelyPlaceAttributions = Array(count, { "" })
-                    mLikelyPlaceLatLngs = Array(count, { LatLng(-33.8523341, 151.2106085) })
+                    mLikelyPlaceNames = Array(count) { "" }
+                    mLikelyPlaceAddresses = Array(count) { "" }
+                    mLikelyPlaceAttributions = Array(count) { "" }
+                    mLikelyPlaceLatLngs = Array(count) { LatLng(-33.8523341, 151.2106085) }
 
                     for (placeLikelihood in likelyPlaces) {
                         // Build a list of likely places to show the user.

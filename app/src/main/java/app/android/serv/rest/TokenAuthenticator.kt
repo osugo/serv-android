@@ -1,6 +1,5 @@
 package app.android.serv.rest
 
-import android.util.Log
 import app.android.serv.R
 import app.android.serv.Serv
 import app.android.serv.model.RequestCredentials
@@ -38,7 +37,7 @@ class TokenAuthenticator : Authenticator {
 
         if (token != null) {
             val request = AndroidNetworking.post("http://serv.mtandao.space/oauth/token")
-                    .addBodyParameter(RequestCredentials(Serv.INSTANCE.getString(R.string.client_id), Serv.INSTANCE.getString(R.string.client_secret), token, "refresh_token"))
+                    .addBodyParameter(RequestCredentials(Serv.instance.getString(R.string.client_id), Serv.instance.getString(R.string.client_secret), token, "refresh_token"))
                     .build()
 
             val response = request.executeForObject(UserCredentials::class.java)

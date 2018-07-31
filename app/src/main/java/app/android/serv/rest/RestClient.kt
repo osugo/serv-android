@@ -1,6 +1,5 @@
 package app.android.serv.rest
 
-import android.util.Log
 import app.android.serv.util.Commons
 import com.google.gson.ExclusionStrategy
 import com.google.gson.FieldAttributes
@@ -11,6 +10,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 /**
@@ -48,7 +48,7 @@ object RestClient {
             else
                 "Using stored credentials object"
 
-            Log.e(TAG, creds)
+            Timber.e(TAG, creds)
 
             val okClient = OkHttpClient.Builder()
                     .connectTimeout(30, TimeUnit.SECONDS)

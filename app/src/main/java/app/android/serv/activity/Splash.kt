@@ -6,9 +6,7 @@ import android.support.v7.app.AppCompatActivity
 import android.view.WindowManager
 import app.android.serv.R
 import app.android.serv.util.Commons
-import app.android.serv.util.RealmUtil
 import com.bumptech.glide.Glide
-import io.realm.Realm
 import kotlinx.android.synthetic.main.splash.*
 import org.jetbrains.anko.clearTop
 import org.jetbrains.anko.intentFor
@@ -31,7 +29,7 @@ class Splash : AppCompatActivity() {
 
     private fun initialize() {
         if (Commons.user != null)
-            startActivity(intentFor<ServiceChooser>().clearTop())
+            startActivity(intentFor<MapActivity>().clearTop())
         else
             startActivity(intentFor<SignIn>().clearTop())
 

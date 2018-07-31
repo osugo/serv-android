@@ -2,6 +2,8 @@ package app.android.serv.activity
 
 import android.annotation.SuppressLint
 import android.app.ProgressDialog
+import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.DialogInterface
 import android.content.pm.PackageManager
@@ -12,6 +14,8 @@ import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.GridLayoutManager
+import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -21,15 +25,19 @@ import android.widget.FrameLayout
 import android.widget.TextView
 import app.android.serv.Constants
 import app.android.serv.R
+import app.android.serv.adapter.ServicesAdapter
 
 import app.android.serv.event.ErrorEvent
 import app.android.serv.model.Property
 import app.android.serv.model.PropertyType
+import app.android.serv.model.Service
 import app.android.serv.rest.ErrorHandler
 import app.android.serv.rest.RestClient
 import app.android.serv.rest.RestInterface
 import app.android.serv.util.NetworkHelper
 import app.android.serv.util.RealmUtil
+import app.android.serv.view.GridItemDecoration
+import app.android.serv.viewmodel.ServicesViewModel
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.common.api.Status
@@ -51,13 +59,16 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import io.realm.Realm
 import io.realm.RealmList
+import io.realm.exceptions.RealmException
 import kotlinx.android.synthetic.main.activity_properties.*
+import kotlinx.android.synthetic.main.service_selection_layout.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import org.jetbrains.anko.*
 import org.jetbrains.anko.design.snackbar
+import timber.log.Timber
 
 class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener {
 
@@ -110,12 +121,24 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
         RestClient.client.create(RestInterface::class.java)
     }
 
+    private var servicesAdapter: ServicesAdapter? = null
+
+    private val icons = intArrayOf(
+            R.drawable.light_bulb,
+            R.drawable.elevator,
+            R.drawable.plumbing,
+            R.drawable.fumigator,
+            R.drawable.air_conditioner,
+            R.drawable.house_inspection,
+            R.drawable.handyman,
+            R.drawable.landscaping
+    )
+
     companion object {
         val TAG: String = MapActivity::class.java.simpleName
         // Keys for storing activity state.
         const val KEY_CAMERA_POSITION = "camera_position"
         const val KEY_LOCATION = "location"
-        val BOUNDS_GREATER_SYDNEY = LatLngBounds(LatLng(-34.041458, 150.790100), LatLng(-33.682247, 151.383362));
     }
 
 //    override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
@@ -153,8 +176,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
         serviceId = intent.getStringExtra(Constants.SERVICE_ID)
 
         setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setHomeButtonEnabled(true)
+//        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+//        supportActionBar?.setHomeButtonEnabled(true)
 
         // Construct a GeoDataClient.
         mGeoDataClient = Places.getGeoDataClient(this)
@@ -183,6 +206,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
         }
 
         setUpAutoCompleteFragment()
+
+        initServices()
     }
 
     private fun setUpAutoCompleteFragment() {
@@ -620,6 +645,58 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
             }
         } catch (e: SecurityException) {
             Log.e("Exception: %s", e.message)
+        }
+    }
+
+    private fun initServices(){
+        servicesAdapter = ServicesAdapter(this)
+        servicesRecycler.adapter = servicesAdapter
+
+        getServices()
+
+        servicesRecycler.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+    }
+
+    private fun getServices(){
+        if (NetworkHelper.isOnline(this)) {
+            val servicesViewModel = ViewModelProviders.of(this).get(ServicesViewModel::class.java)
+            servicesViewModel.getServices().observe(this, Observer {
+                it?.let {
+//                    hideProgressDialog()
+                    showServices(it)
+                }
+            })
+        } else {
+//            hideProgressDialog()
+            snackbar(parentLayout, getString(R.string.network_unavailable))
+        }
+    }
+
+    private fun showServices(services: RealmList<Service>){
+        if (services.isNotEmpty()) {
+            services.forEach {
+                when (it.name) {
+                    "Electrical" -> it.icon = icons[0]
+                    "Lift Maintenance" -> it.icon = icons[1]
+                    "Plumbing" -> it.icon = icons[2]
+                    "Fumigation" -> it.icon = icons[3]
+                    "AC Maintenance" -> it.icon = icons[4]
+                    "Property Inspection" -> it.icon = icons[5]
+                    "Handyman Services" -> it.icon = icons[6]
+                    "Ground Maintenance" -> it.icon = icons[7]
+                }
+            }
+
+            saveServicesToRealm(services)
+
+            servicesAdapter?.setData(services)
+            servicesAdapter?.notifyDataSetChanged()
+        }
+    }
+
+    private fun saveServicesToRealm(services: RealmList<Service>) {
+        realm.executeTransaction {
+            it.copyToRealmOrUpdate(services)
         }
     }
 

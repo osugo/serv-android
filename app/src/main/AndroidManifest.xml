@@ -77,7 +77,7 @@
         <activity
             android:name="app.android.serv.activity.MapActivity"
             android:windowSoftInputMode="stateHidden"
-            android:label="@string/title_activity_properties">
+            android:label="@string/app_name">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="app.android.serv.activity.ServiceChooser" />

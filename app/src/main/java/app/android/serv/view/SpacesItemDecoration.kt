@@ -9,16 +9,16 @@ import android.view.View
  */
 class SpacesItemDecoration(private val spacesInPixels: Int) : RecyclerView.ItemDecoration() {
 
-    override fun getItemOffsets(outRect: Rect?, view: View?, parent: RecyclerView?, state: RecyclerView.State?) {
-        outRect?.left = spacesInPixels;
-        outRect?.right = spacesInPixels;
-        outRect?.bottom = spacesInPixels;
+    override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
+        outRect.left = spacesInPixels;
+        outRect.right = spacesInPixels;
+        outRect.bottom = spacesInPixels;
 
         // Add top margin only for the first item to avoid double spacesInPixels between items
-        if (parent?.getChildLayoutPosition(view) == 0) {
-            outRect?.top = spacesInPixels;
+        if (parent.getChildLayoutPosition(view) == 0) {
+            outRect.top = spacesInPixels;
         } else {
-            outRect?.top = 0;
+            outRect.top = 0;
         }
     }
 }

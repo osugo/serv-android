@@ -7,11 +7,18 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
+import app.android.serv.Constants
 import app.android.serv.R
+import app.android.serv.activity.MapActivity
+import app.android.serv.activity.Properties
+import app.android.serv.model.Property
 import app.android.serv.model.Service
+import app.android.serv.util.RealmUtil
 import app.android.serv.view.SquareImageView
+import io.realm.Realm
 import io.realm.RealmList
 import org.jetbrains.anko.find
+import org.jetbrains.anko.intentFor
 
 /**
  * Created by kombo on 07/10/2017.
@@ -52,12 +59,12 @@ class ServicesAdapter(private val context: Context) : RecyclerView.Adapter<Servi
             }
 
             background.setOnClickListener {
-//                Realm.getInstance(RealmUtil.realmConfig).use {
-//                    if (it.where(Property::class.java).findAll().isNotEmpty())
-//                        context.startActivity(context.intentFor<Properties>(Constants.SERVICE_ID to service.id))
-//                    else
-//                        context.startActivity(context.intentFor<MapActivity>(Constants.SERVICE_ID to service.id))
-//                }
+                Realm.getInstance(RealmUtil.realmConfig).use {
+                    if (it.where(Property::class.java).findAll().isNotEmpty())
+                        context.startActivity(context.intentFor<Properties>(Constants.SERVICE_ID to service.id))
+                    else
+                        context.startActivity(context.intentFor<MapActivity>(Constants.SERVICE_ID to service.id))
+                }
             }
         }
     }

@@ -7,6 +7,7 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.DialogInterface
 import android.content.pm.PackageManager
+import android.content.res.Resources
 import android.location.Location
 import android.os.Bundle
 import android.os.Handler
@@ -14,7 +15,6 @@ import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
 import android.view.Menu
@@ -26,7 +26,6 @@ import android.widget.TextView
 import app.android.serv.Constants
 import app.android.serv.R
 import app.android.serv.adapter.ServicesAdapter
-
 import app.android.serv.event.ErrorEvent
 import app.android.serv.model.Property
 import app.android.serv.model.PropertyType
@@ -36,7 +35,6 @@ import app.android.serv.rest.RestClient
 import app.android.serv.rest.RestInterface
 import app.android.serv.util.NetworkHelper
 import app.android.serv.util.RealmUtil
-import app.android.serv.view.GridItemDecoration
 import app.android.serv.viewmodel.ServicesViewModel
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
@@ -51,7 +49,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -59,9 +57,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import io.realm.Realm
 import io.realm.RealmList
-import io.realm.exceptions.RealmException
 import kotlinx.android.synthetic.main.activity_properties.*
-import kotlinx.android.synthetic.main.service_selection_layout.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -268,6 +264,15 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
             }
         })
 
+        try {
+            val success = map.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.map_style))
+
+            if(!success)
+                Timber.e("Style parsing failed")
+        } catch (e: Resources.NotFoundException){
+            Timber.e("Can't find style ${e.localizedMessage}")
+        }
+
         map.setOnMapLongClickListener { latLng -> showMarker(latLng!!, latLng.latitude.toString() + ", " + latLng.longitude.toString(), "") }
 
         // Prompt the user for permission.
@@ -336,15 +341,15 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
                             map.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(it.latitude, it.longitude), DEFAULT_ZOOM.toFloat()))
                         }
                     } else {
-                        Log.d(TAG, "Current location is null. Using defaults.")
-                        Log.e(TAG, "Exception: %s", task.exception)
+                        Timber.d( "Exception: %s", task.exception)
+                        Timber.d( "Current location is null. Using defaults.")
                         map.moveCamera(CameraUpdateFactory.newLatLngZoom(mDefaultLocation, DEFAULT_ZOOM.toFloat()))
                         map.uiSettings.isMyLocationButtonEnabled = false
                     }
                 }
             }
         } catch (e: SecurityException) {
-            Log.e("Exception: %s", e.message)
+           Timber.e("Exception: %s", e.message)
         }
 
     }
@@ -391,12 +396,16 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         return when (item?.itemId) {
-            R.id.pick_place -> {
-                showCurrentPlace()
-                true
-            }
+//            R.id.pick_place -> {
+//                showCurrentPlace()
+//                true
+//            }
             android.R.id.home -> {
                 onBackPressed()
+                true
+            }
+            R.id.done -> {
+                showPropertyTypes()
                 true
             }
             else -> false
@@ -712,6 +721,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onErrorEvent(errorEvent: ErrorEvent) {
+        hideProgressDialog()
+
         if (!isFinishing)
             alert(errorEvent.message) {
                 yesButton {

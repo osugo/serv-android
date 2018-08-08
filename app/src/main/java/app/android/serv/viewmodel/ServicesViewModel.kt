@@ -56,7 +56,7 @@ class ServicesViewModel : ViewModel() {
                 .subscribe({
                     services?.postValue(it)
                 }) {
-                    services?.value = null
+                    services?.postValue(null)
                     ErrorHandler.showError(it)
                 }
     }

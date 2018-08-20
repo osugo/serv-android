@@ -51,7 +51,7 @@ class ServicesViewModel : ViewModel() {
     }
 
     private fun loadFromNetwork(){
-        restInterface.getServices()
+        restInterface.getServices
                 .subscribeOn(Schedulers.io())
                 .subscribe({
                     services?.postValue(it)

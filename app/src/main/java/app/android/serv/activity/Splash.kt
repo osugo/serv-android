@@ -29,7 +29,7 @@ class Splash : AppCompatActivity() {
 
     private fun initialize() {
         if (Commons.user != null)
-            startActivity(intentFor<MapActivity>().clearTop())
+            startActivity(intentFor<DetailsActivity>().clearTop())
         else
             startActivity(intentFor<SignIn>().clearTop())
 

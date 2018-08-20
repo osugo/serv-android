@@ -43,6 +43,10 @@
             android:label="My Properties"
             android:launchMode="singleTop" />
         <activity
+            android:name="app.android.serv.activity.DetailsActivity"
+            android:windowSoftInputMode="stateHidden"
+            android:label="" />
+        <activity
             android:name="app.android.serv.activity.Details"
             android:windowSoftInputMode="stateHidden"
             android:label="" />
@@ -53,6 +57,9 @@
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id" />
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
 
         <activity
             android:name="com.facebook.FacebookActivity"

@@ -9,6 +9,7 @@ import com.facebook.FacebookSdk
 import com.facebook.appevents.AppEventsLogger
 import io.fabric.sdk.android.Fabric
 import io.realm.Realm
+import timber.log.Timber
 
 /**
  * Created by kombo on 28/03/2018.
@@ -16,14 +17,14 @@ import io.realm.Realm
 class Serv : MultiDexApplication() {
 
     companion object {
-        lateinit var INSTANCE: Serv
+        lateinit var instance: Serv
             private set
     }
 
     override fun onCreate() {
         super.onCreate()
 
-        INSTANCE = this
+        instance = this
 
         FacebookSdk.sdkInitialize(applicationContext)
         AppEventsLogger.activateApp(this)
@@ -31,11 +32,18 @@ class Serv : MultiDexApplication() {
         Realm.init(this)
         Realm.setDefaultConfiguration(RealmUtil.realmConfig)
 
-        if (BuildConfig.DEBUG)
-            Fabric.with(this, Answers())
-        else
-            Fabric.with(this, Crashlytics(), Answers())
+        initLoggingTools()
 
         AndroidNetworking.initialize(applicationContext)
+    }
+
+    private fun initLoggingTools(){
+        if (BuildConfig.DEBUG) {
+            Fabric.with(this, Answers())
+
+            Timber.uprootAll()
+            Timber.plant(Timber.DebugTree())
+        } else
+            Fabric.with(this, Crashlytics(), Answers())
     }
 }

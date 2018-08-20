@@ -2,9 +2,16 @@ package app.android.serv.activity
 
 import android.annotation.SuppressLint
 import android.app.ProgressDialog
+import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.DialogInterface
 import android.content.pm.PackageManager
+import android.content.res.Resources
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.PorterDuff
 import android.location.Location
 import android.os.Bundle
 import android.os.Handler
@@ -12,24 +19,32 @@ import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.FrameLayout
+import android.widget.ImageView
 import android.widget.TextView
 import app.android.serv.Constants
 import app.android.serv.R
-
+import app.android.serv.adapter.ServicesAdapter
 import app.android.serv.event.ErrorEvent
+import app.android.serv.model.Expert
 import app.android.serv.model.Property
 import app.android.serv.model.PropertyType
+import app.android.serv.model.Service
 import app.android.serv.rest.ErrorHandler
 import app.android.serv.rest.RestClient
 import app.android.serv.rest.RestInterface
 import app.android.serv.util.NetworkHelper
 import app.android.serv.util.RealmUtil
+import app.android.serv.viewmodel.ExpertsViewModel
+import app.android.serv.viewmodel.ServicesViewModel
+import com.bumptech.glide.Glide
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.common.api.Status
@@ -42,22 +57,20 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.LatLngBounds
-import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.*
+import com.google.maps.android.ui.IconGenerator
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import io.realm.Realm
 import io.realm.RealmList
 import kotlinx.android.synthetic.main.activity_properties.*
-import kotlinx.android.synthetic.main.toolbar.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import org.jetbrains.anko.*
 import org.jetbrains.anko.design.snackbar
+import timber.log.Timber
 
 class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener {
 
@@ -110,12 +123,24 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
         RestClient.client.create(RestInterface::class.java)
     }
 
+    private var servicesAdapter: ServicesAdapter? = null
+
+    private val icons = intArrayOf(
+            R.drawable.light_bulb,
+            R.drawable.elevator,
+            R.drawable.plumbing,
+            R.drawable.fumigator,
+            R.drawable.air_conditioner,
+            R.drawable.house_inspection,
+            R.drawable.handyman,
+            R.drawable.landscaping
+    )
+
     companion object {
         val TAG: String = MapActivity::class.java.simpleName
         // Keys for storing activity state.
         const val KEY_CAMERA_POSITION = "camera_position"
         const val KEY_LOCATION = "location"
-        val BOUNDS_GREATER_SYDNEY = LatLngBounds(LatLng(-34.041458, 150.790100), LatLng(-33.682247, 151.383362));
     }
 
 //    override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
@@ -137,7 +162,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
 
     override fun onConnectionFailed(connectionResult: ConnectionResult) {
         //do nothing, connection failed
-        Log.e(TAG, "onConnectionFailed: ConnectionResult.getErrorCode() = " + connectionResult.errorCode)
+        Timber.e("onConnectionFailed: ConnectionResult.getErrorCode() = %s", connectionResult.errorCode)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -152,9 +177,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
 
         serviceId = intent.getStringExtra(Constants.SERVICE_ID)
 
-        setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setHomeButtonEnabled(true)
+//        setSupportActionBar(toolbar)
 
         // Construct a GeoDataClient.
         mGeoDataClient = Places.getGeoDataClient(this)
@@ -183,6 +206,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
         }
 
         setUpAutoCompleteFragment()
+
+        initServices()
     }
 
     private fun setUpAutoCompleteFragment() {
@@ -193,11 +218,11 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
                 hideKeyboard()
 
                 place?.let {
-                    Log.e(TAG, it.address.toString())
+                    Timber.i(it.address.toString())
 
                     showMarker(it.latLng, it.name.toString(), it.address.toString())
 
-                    Log.i(TAG, "Place details received: ${it.name}")
+                    Timber.i( "Place details received: ${it.name}")
                 }
 
             }
@@ -243,6 +268,15 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
             }
         })
 
+        try {
+            val success = map.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.map_style))
+
+            if(!success)
+                Timber.e("Style parsing failed")
+        } catch (e: Resources.NotFoundException){
+            Timber.e("Can't find style ${e.localizedMessage}")
+        }
+
         map.setOnMapLongClickListener { latLng -> showMarker(latLng!!, latLng.latitude.toString() + ", " + latLng.longitude.toString(), "") }
 
         // Prompt the user for permission.
@@ -264,7 +298,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
         super.onSaveInstanceState(outState)
     }
 
-//    /**
+//    /**w
 //     * Callback for results from a Places Geo Data API query that shows the first place result in
 //     * the details view on screen.
 //     */
@@ -311,15 +345,15 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
                             map.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(it.latitude, it.longitude), DEFAULT_ZOOM.toFloat()))
                         }
                     } else {
-                        Log.d(TAG, "Current location is null. Using defaults.")
-                        Log.e(TAG, "Exception: %s", task.exception)
+                        Timber.d( "Exception: %s", task.exception)
+                        Timber.d( "Current location is null. Using defaults.")
                         map.moveCamera(CameraUpdateFactory.newLatLngZoom(mDefaultLocation, DEFAULT_ZOOM.toFloat()))
                         map.uiSettings.isMyLocationButtonEnabled = false
                     }
                 }
             }
         } catch (e: SecurityException) {
-            Log.e("Exception: %s", e.message)
+           Timber.e("Exception: %s", e.message)
         }
 
     }
@@ -366,12 +400,16 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         return when (item?.itemId) {
-            R.id.pick_place -> {
-                showCurrentPlace()
-                true
-            }
+//            R.id.pick_place -> {
+//                showCurrentPlace()
+//                true
+//            }
             android.R.id.home -> {
                 onBackPressed()
+                true
+            }
+            R.id.done -> {
+                showPropertyTypes()
                 true
             }
             else -> false
@@ -397,7 +435,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
                     showProgressDialog()
 
                     disposable.add(
-                            restInterface.getPropertyTypes()
+                            restInterface.getPropertyTypes
                                     .subscribeOn(Schedulers.io())
                                     .observeOn(AndroidSchedulers.mainThread())
                                     .subscribe({
@@ -619,7 +657,84 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
                 getLocationPermission()
             }
         } catch (e: SecurityException) {
-            Log.e("Exception: %s", e.message)
+            Timber.e("Exception: %s", e.message)
+        }
+    }
+
+    private fun initServices(){
+        servicesAdapter = ServicesAdapter(this)
+        servicesRecycler.adapter = servicesAdapter
+
+        getServices()
+
+        servicesRecycler.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+
+        getExperts()
+    }
+
+    private fun getServices(){
+        if (NetworkHelper.isOnline(this)) {
+            val servicesViewModel = ViewModelProviders.of(this).get(ServicesViewModel::class.java)
+            servicesViewModel.getServices().observe(this, Observer {
+                it?.let {
+//                    hideProgressDialog()
+                    showServices(it)
+                }
+            })
+        } else {
+//            hideProgressDialog()
+            snackbar(parentLayout, getString(R.string.network_unavailable))
+        }
+    }
+
+    private fun getExperts(){
+        if(NetworkHelper.isOnline(this)) {
+            val expertsViewModel = ViewModelProviders.of(this).get(ExpertsViewModel::class.java)
+            expertsViewModel.getExperts().observe(this, Observer {
+                it?.let {
+                    showExpertMarkers(it)
+                }
+            })
+        }
+    }
+
+    private fun showExpertMarkers(experts: ArrayList<Expert>){
+        val iconFactory = IconGenerator(this)
+        iconFactory.setColor(ContextCompat.getColor(this, R.color.app_theme))
+
+        experts.forEach {
+            map.addMarker(MarkerOptions()
+                    .icon(BitmapDescriptorFactory.fromBitmap(iconFactory.makeIcon(it.service!!.first().name)))
+                    .position(LatLng(it.address!!.latitude!!.toDouble(), it.address!!.longitude!!.toDouble()))
+                    .anchor(iconFactory.anchorU, iconFactory.anchorV))
+        }
+    }
+
+    private fun showServices(services: RealmList<Service>){
+        if (services.isNotEmpty()) {
+            services.forEach {
+                when (it.name) {
+                    "Electrical" -> it.icon = icons[0]
+                    "Lift Maintenance" -> it.icon = icons[1]
+                    "Plumbing" -> it.icon = icons[2]
+                    "Fumigation" -> it.icon = icons[3]
+                    "AC Maintenance" -> it.icon = icons[4]
+                    "Property Inspection" -> it.icon = icons[5]
+                    "Handyman Services" -> it.icon = icons[6]
+                    "Ground Maintenance" -> it.icon = icons[7]
+                }
+            }
+
+            saveServicesToRealm(services)
+
+            servicesAdapter?.setData(services)
+            servicesAdapter?.notifyDataSetChanged()
+        }
+    }
+
+    private fun saveServicesToRealm(services: RealmList<Service>) {
+        realm.executeTransaction {
+            it.copyToRealmOrUpdate(services)
         }
     }
 
@@ -635,6 +750,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onErrorEvent(errorEvent: ErrorEvent) {
+        hideProgressDialog()
+
         if (!isFinishing)
             alert(errorEvent.message) {
                 yesButton {
@@ -647,7 +764,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.OnC
         val view = currentFocus
 
         val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
+        inputMethodManager.hideSoftInputFromWindow(view?.windowToken, 0)
     }
 
     override fun onDestroy() {

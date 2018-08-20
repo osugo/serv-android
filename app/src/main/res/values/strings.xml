@@ -39,4 +39,5 @@
     <string name="unexpected_error">An unexpected error occurred. Please try again.</string>
     <string name="network_error">A network error occurred. Please check your connection.</string>
     <string name="network_unavailable">Network unavailable</string>
+    <string name="attach_file">Attach File</string>
 </resources>

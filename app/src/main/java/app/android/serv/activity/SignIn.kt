@@ -186,7 +186,7 @@ class SignIn : BaseActivity(), GoogleApiClient.OnConnectionFailedListener, View.
                                 hideProgressDialog()
                                 PrefUtils.putString(PrefUtils.USER, Gson().toJson(it))
 
-                                startActivity(intentFor<ServiceChooser>().clearTop())
+                                startActivity(intentFor<MapActivity>().clearTop())
                             }) {
                                 ErrorHandler.showError(it)
                             }

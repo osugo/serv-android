@@ -120,7 +120,7 @@ object ErrorHandler {
     }
 
     private fun accessStringResource(resourceName: Int): String {
-        return Serv.INSTANCE.resources.getString(resourceName)
+        return Serv.instance.resources.getString(resourceName)
     }
 
     /**

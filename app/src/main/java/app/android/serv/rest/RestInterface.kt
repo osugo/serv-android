@@ -17,17 +17,20 @@ interface RestInterface {
     @POST("google/signin")
     fun signInWithGoogle(@Body clientCredentials: ClientCredentials): Observable<User>
 
-    @GET("services")
-    fun getServices(): Observable<RealmList<Service>>
+    @get:GET("services")
+    val getServices: Observable<RealmList<Service>>
 
     @POST("oauth/token")
     fun refreshToken(@Body requestCredentials: RequestCredentials): Call<UserCredentials>
 
-    @GET("property_types")
-    fun getPropertyTypes(): Observable<RealmList<PropertyType>>
+    @get:GET("property_types")
+    val getPropertyTypes: Observable<RealmList<PropertyType>>
 
-    @GET("properties")
-    fun getProperties(): Observable<ArrayList<Property>>
+    @get:GET("properties")
+    val getProperties: Observable<ArrayList<Property>>
+
+    @get:GET("experts")
+    val getExperts: Observable<ArrayList<Expert>>
 
     @POST("properties")
     fun createProperty(@Body property: Property): Observable<Property>

@@ -1,6 +1,6 @@
 <resources>
 
-    <style name="BaseTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
+    <style name="BaseTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="windowActionBar">false</item>
         <item name="windowActionModeOverlay">true</item>

@@ -52,7 +52,7 @@ class ServicesAdapter(private val context: Context) : RecyclerView.Adapter<Servi
             val name = itemView.find(R.id.service) as TextView
             val icon = itemView.find(R.id.icon) as SquareImageView
 
-            name.text = service.name
+            name.text = service.name?.split(" ")?.first()
 
             service.icon?.let {
                 icon.setImageResource(it)

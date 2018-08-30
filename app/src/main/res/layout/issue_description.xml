@@ -22,9 +22,9 @@
                 android:id="@+id/serviceName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/open_sans_semibold"
-                android:text="Ground Maintenance"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:fontFamily="@font/montserrat"
+                android:text="Electrical"
+                android:textAppearance="@style/TextAppearance.AppCompat.Display1"
                 android:textColor="@android:color/black" />
 
             <TextView
@@ -39,7 +39,7 @@
 
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/issueTitle"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/subtitle"
@@ -55,7 +55,7 @@
 
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/description"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/issueTitle"
@@ -76,9 +76,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:fontFamily="@font/open_sans_semibold"
+                android:fontFamily="@font/montserrat"
                 android:text="Schedule Service"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textAppearance="@style/TextAppearance.AppCompat.Display1"
                 android:textColor="@android:color/black" />
 
             <TextView
@@ -91,8 +91,8 @@
                 android:textColor="@android:color/black" />
 
             <android.support.design.widget.TextInputLayout
-                android:id="@+id/date"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:id="@+id/dateLayout"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/subtitle"
@@ -100,6 +100,7 @@
                 android:textColorHint="#999">
 
                 <android.support.design.widget.TextInputEditText
+                    android:id="@+id/dateEt"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Date"
@@ -107,8 +108,8 @@
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
-                android:id="@+id/time"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:id="@+id/timeLayout"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/subtitle"
@@ -116,6 +117,7 @@
                 android:textColorHint="#999">
 
                 <android.support.design.widget.TextInputEditText
+                    android:id="@+id/timeEt"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Time"
@@ -127,15 +129,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginTop="10dp"
-                android:scaleType="centerCrop" />
+                android:scaleType="centerCrop"
+                android:visibility="gone" />
 
             <android.support.design.button.MaterialButton
                 android:id="@+id/next_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="30dp"
+                android:layout_marginTop="40dp"
                 android:text="Schedule"
-                app:cornerRadius="4dp" />
+                app:cornerRadius="6dp" />
         </LinearLayout>
     </ScrollView>
 

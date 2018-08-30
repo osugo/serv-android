@@ -3,6 +3,9 @@ package app.android.serv.activity
 import android.Manifest
 import android.annotation.TargetApi
 import android.app.Activity
+import android.app.DatePickerDialog
+import android.app.Dialog
+import android.app.TimePickerDialog
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -12,14 +15,25 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.support.v4.app.DialogFragment
 import android.support.v4.content.FileProvider
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
+import android.text.format.DateFormat
 import android.view.Menu
 import android.view.MenuItem
+import android.view.MotionEvent
+import android.view.View
+import android.widget.DatePicker
+import android.widget.TimePicker
 import app.android.serv.R
+import app.android.serv.event.DateTimeEvent
 import kotlinx.android.synthetic.main.issue_description.*
 import kotlinx.android.synthetic.main.toolbar.*
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
+import org.jetbrains.anko.selector
 import timber.log.Timber
 import java.io.File
 import java.io.IOException
@@ -29,7 +43,7 @@ import java.util.*
 /**
  * Created by kombo on 16/08/2018.
  */
-class DetailsActivity : AppCompatActivity() {
+class DetailsActivity : AppCompatActivity(), View.OnTouchListener {
 
     private var currentPhotoPath: String? = null
 
@@ -40,6 +54,7 @@ class DetailsActivity : AppCompatActivity() {
     companion object {
         const val PERMISSIONS_RESULT = 102
         const val REQUEST_TAKE_PHOTO = 2
+        const val REQUEST_GET_SINGLE_FILE = 3
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,10 +66,33 @@ class DetailsActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         getPermissions()
+
+        timeEt.setOnTouchListener(this)
+        dateEt.setOnTouchListener(this)
+    }
+
+    override fun onTouch(v: View?, event: MotionEvent?): Boolean {
+        if (event?.action == MotionEvent.ACTION_DOWN) {
+            return when (v?.id) {
+                R.id.timeEt -> {
+                    val timePickerDialog = TimePickerFragment()
+                    timePickerDialog.show(supportFragmentManager, "timePicker")
+                    true
+                }
+                R.id.dateEt -> {
+                    val datePickerDialog = DatePickerFragment()
+                    datePickerDialog.show(supportFragmentManager, "datePicker")
+                    true
+                }
+                else -> false
+            }
+        }
+        return false
     }
 
     private fun getPermissions() {
         permissions.add(Manifest.permission.CAMERA)
+        permissions.add(Manifest.permission.READ_EXTERNAL_STORAGE)
 
         permissionsToRequest = findUnaskedPermissions(permissions)
 
@@ -144,15 +182,36 @@ class DetailsActivity : AppCompatActivity() {
         bmOptions.inPurgeable = true
 
         val bitmap = BitmapFactory.decodeFile(currentPhotoPath, bmOptions)
+
+        image.visibility = View.VISIBLE
         image.setImageBitmap(bitmap)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == REQUEST_TAKE_PHOTO && resultCode == Activity.RESULT_OK) {
-            Timber.e("Setting pic")
-            currentPhotoPath?.let {
-                setPic()
-                addPhotoToGallery()
+        if (resultCode == Activity.RESULT_OK) {
+            when (requestCode) {
+                REQUEST_TAKE_PHOTO -> {
+                    currentPhotoPath?.let {
+                        setPic()
+                        addPhotoToGallery()
+                    }
+                }
+                REQUEST_GET_SINGLE_FILE -> {
+                    val uri = data?.data
+                    val projection = arrayOf(MediaStore.Images.Media.DATA)
+
+                    val cursor = contentResolver.query(uri!!, projection, null, null, null)
+                    cursor?.moveToFirst()
+
+                    val columnIndex = cursor?.getColumnIndex(projection[0])
+                    val filepath = cursor?.getString(columnIndex!!)
+                    cursor?.close()
+
+                    val bitmap = BitmapFactory.decodeFile(filepath)
+
+                    image.visibility = View.VISIBLE
+                    image.setImageBitmap(bitmap)
+                }
             }
         }
     }
@@ -186,7 +245,14 @@ class DetailsActivity : AppCompatActivity() {
                 true
             }
             R.id.upload_image -> {
-                takePicture()
+                val sources = listOf("Camera", "Gallery")
+
+                selector("Choose source", sources) { _, i ->
+                    when (sources[i]) {
+                        "Camera" -> takePicture()
+                        else -> fetchPicture()
+                    }
+                }
                 true
             }
             else -> {
@@ -194,6 +260,12 @@ class DetailsActivity : AppCompatActivity() {
             }
         }
     }
+
+    private fun fetchPicture() {
+        val intent = Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+        startActivityForResult(intent, REQUEST_GET_SINGLE_FILE)
+    }
+
 
     @TargetApi(Build.VERSION_CODES.M)
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
@@ -220,6 +292,58 @@ class DetailsActivity : AppCompatActivity() {
                     }
                 }
             }
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        EventBus.getDefault().register(this)
+    }
+
+    override fun onStop() {
+        EventBus.getDefault().unregister(this)
+        super.onStop()
+    }
+
+    class TimePickerFragment : DialogFragment(), TimePickerDialog.OnTimeSetListener {
+
+        override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+            val c = Calendar.getInstance()
+            val hour = c.get(Calendar.HOUR_OF_DAY)
+            val min = c.get(Calendar.MINUTE)
+
+            return TimePickerDialog(activity, this, hour, min, DateFormat.is24HourFormat(activity))
+        }
+
+        override fun onTimeSet(view: TimePicker?, hourOfDay: Int, minute: Int) {
+            EventBus.getDefault().post(DateTimeEvent(null, "$hourOfDay:$minute"))
+        }
+    }
+
+    class DatePickerFragment : DialogFragment(), DatePickerDialog.OnDateSetListener {
+
+        override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+            val c = Calendar.getInstance()
+            val year = c.get(Calendar.YEAR)
+            val month = c.get(Calendar.MONTH)
+            val day = c.get(Calendar.DAY_OF_MONTH)
+
+            return DatePickerDialog(activity, this, year, month, day)
+        }
+
+        override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int) {
+            EventBus.getDefault().post(DateTimeEvent("$dayOfMonth/${(month+1)}/$year", null))
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onDateTimeEvent(dateTimeEvent: DateTimeEvent){
+        dateTimeEvent.date?.let {
+            dateEt.setText(it)
+        }
+
+        dateTimeEvent.time?.let {
+            timeEt.setText(it)
         }
     }
 }
